@@ -16,11 +16,13 @@ export const createWebsite = async (payload: any) => {
       cache: "no-store",
     });
 
+    const data = await res.json();
     if (!res.ok) {
-      throw new Error("Failed to create website");
+      return data;
+      // throw new Error("Failed to create website");
     }
 
-    return await res.json();
+    return data;
   } catch (error: any) {
     console.log(error);
     throw new Error(error.message);
@@ -30,20 +32,34 @@ export const createWebsite = async (payload: any) => {
 /**
  * GET ALL Websites
  */
+
 export const getAllWebsites = async () => {
   try {
     const res = await fetch(BASE_URL, {
       method: "GET",
       cache: "no-store",
+      credentials: "include", // NEW: send cookies
     });
 
+    const data = await res.json();
+
+    // EDITED: return error message from backend instead of generic throw
     if (!res.ok) {
-      throw new Error("Failed to fetch websites");
+      return {
+        success: false,
+        message: data.message || "Failed to fetch websites",
+        data: null,
+      };
     }
 
-    return await res.json();
+    return { success: true, data: data.data, message: null };
   } catch (error: any) {
-    throw new Error(error.message);
+    // network error — server completely unreachable
+    return {
+      success: false,
+      message: "Network error — is the server running?",
+      data: null,
+    };
   }
 };
 

@@ -6,11 +6,12 @@ export interface Website {
   currentUrl: string;
   remakeUrl?: string;
   mailId: string;
-  associateMail: string;
+  associateMail?: string;
   phone?: string;
   country?: string;
   city?: string;
   mailStatus: MailStatus;
+  sentAt?: Date;
 }
 
 export interface Template {

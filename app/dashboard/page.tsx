@@ -1,11 +1,14 @@
 import { Globe, Send, Clock, AlertCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { mockWebsites } from "@/lib/mock-data";
 import { getAllWebsites } from "@/services/websites";
 import Navbar from "@/components/Navbar";
+import { EmailCalendar } from "@/components/EmailCalendar";
 
 const Dashboard = async () => {
-  const { data } = await getAllWebsites();
+  const response = await getAllWebsites();
+
+  const data = response?.data ?? [];
+
   const stats = [
     {
       label: "Total Websites",
@@ -55,6 +58,7 @@ const Dashboard = async () => {
           </Card>
         ))}
       </div>
+      <EmailCalendar website={data} />
     </div>
   );
 };

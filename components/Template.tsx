@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -59,16 +59,23 @@ const templateSchema = z.object({
 type TemplateFormValues = z.infer<typeof templateSchema>;
 interface IProps {
   template: Template[];
+  error: string | null;
 }
 
 // ---------------------------------------------------------------------------
 // Page component
 // ---------------------------------------------------------------------------
-export default function TemplatesPage({ template }: IProps) {
+export default function TemplatesPage({ template, error }: IProps) {
   const [templates, setTemplates] = useState<Template[]>(template);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   //   const { toast } = useToast();
+
+   useEffect(() => {
+      if (error) {
+        toast.error(error);
+      }
+    }, [error]);
 
   const form = useForm<TemplateFormValues>({
     resolver: zodResolver(templateSchema),

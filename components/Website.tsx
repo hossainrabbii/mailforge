@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -76,7 +76,7 @@ const websiteSchema = z.object({
     .optional()
     .or(z.literal("")),
   mailId: z.string().trim().email("Must be a valid email"),
-  associateMail: z.string().trim().email("Must be a valid email"),
+  associateMail: z.string().trim().optional(),
   phone: z.string().trim().max(20).optional(),
   country: z.string().trim().max(50).optional(),
   city: z.string().trim().max(50).optional(),
@@ -84,11 +84,12 @@ const websiteSchema = z.object({
 
 interface IProps {
   website: Website[];
+  error: string | null;
 }
 
 type WebsiteFormValues = z.infer<typeof websiteSchema>;
 
-export default function WebsitesPage({ website }: IProps) {
+export default function WebsitesPage({ website, error }: IProps) {
   const [websites, setWebsites] = useState<Website[]>(website);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -96,7 +97,11 @@ export default function WebsitesPage({ website }: IProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  // console.log(website);
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   const form = useForm<WebsiteFormValues>({
     resolver: zodResolver(websiteSchema),
@@ -164,8 +169,9 @@ export default function WebsitesPage({ website }: IProps) {
       };
 
       const response = await createWebsite(data);
+      console.log(response);
       if (!response?.success) {
-        toast("Something went wrong");
+        toast(response?.message);
         return;
       }
       toast("Website Added");
@@ -183,7 +189,7 @@ export default function WebsitesPage({ website }: IProps) {
       currentUrl: w.currentUrl,
       remakeUrl: w.remakeUrl || "",
       mailId: w.mailId,
-      associateMail: w.associateMail,
+      associateMail: w.associateMail || "",
       phone: w.phone || "",
       country: w.country || "",
       city: w.city || "",
@@ -297,66 +303,73 @@ export default function WebsitesPage({ website }: IProps) {
 
       {/* Table */}
       <div className="border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-10">
-                <Checkbox
-                  checked={
-                    filtered.length > 0 && selected.size === filtered.length
-                  }
-                  onCheckedChange={toggleAll}
-                />
-              </TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Current URL</TableHead>
-              <TableHead>Remake URL</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-20">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
+        {filtered?.length == 0 ? (
+          <p className="p-4">No data found</p>
+        ) : (
+          <>
+            {" "}
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-10">
+                    <Checkbox
+                      checked={
+                        filtered.length > 0 && selected.size === filtered.length
+                      }
+                      onCheckedChange={toggleAll}
+                    />
+                  </TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Current URL</TableHead>
+                  <TableHead>Remake URL</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="w-20">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
 
-          <TableBody>
-            {filtered.map((w) => (
-              <TableRow key={w._id}>
-                <TableCell>
-                  <Checkbox
-                    checked={selected.has(w._id)}
-                    onCheckedChange={() => toggleSelect(w._id)}
-                  />
-                </TableCell>
-                <TableCell>{w.name || "—"}</TableCell>
-                <TableCell className="truncate max-w-[200px]">
-                  <Link href={w.currentUrl}> {w.currentUrl}</Link>
-                </TableCell>
-                <TableCell className="truncate max-w-[200px]">
-                  {w.remakeUrl}
-                </TableCell>
-                <TableCell>{w.mailId}</TableCell>
-                <TableCell>
-                  <StatusBadge status={w.mailStatus} />
-                </TableCell>
-                <TableCell className="flex gap-1">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => handleEdit(w)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => handleDelete(w._id)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+              <TableBody>
+                {filtered.map((w) => (
+                  <TableRow key={w._id}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selected.has(w._id)}
+                        onCheckedChange={() => toggleSelect(w._id)}
+                      />
+                    </TableCell>
+                    <TableCell>{w.name || "—"}</TableCell>
+                    <TableCell className="truncate max-w-[200px]">
+                      <Link href={w.currentUrl as string}> {w.currentUrl}</Link>
+                    </TableCell>
+                    <TableCell className="truncate max-w-[200px]">
+                      <Link href={w.remakeUrl as string}> {w.remakeUrl}</Link>
+                    </TableCell>
+                    <TableCell>{w.mailId}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={w.mailStatus} />
+                    </TableCell>
+                    <TableCell className="flex gap-1">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => handleEdit(w)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => handleDelete(w._id)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </>
+        )}
       </div>
     </div>
   );

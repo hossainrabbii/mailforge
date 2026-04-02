@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,10 +35,11 @@ import { CountdownCircle } from "@/components/CountdownCircle";
 interface IProps {
   template: Template[];
   website: Website[];
+  error: string | null;
 }
 type MailStatus = "all" | "pending" | "sent" | "failed";
 
-export default function SendMailPage({ template, website }: IProps) {
+export default function SendMailPage({ template, website, error }: IProps) {
   const [websites] = useState<Website[]>(website);
   const [templates] = useState<Template[]>(template.filter((t) => t.active));
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -48,6 +49,11 @@ export default function SendMailPage({ template, website }: IProps) {
   // NEW: stores countdown ms when backend is waiting between mails
   const [countdownMs, setCountdownMs] = useState<number | null>(null);
 
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
   // NEW: connect to SSE — toasts fire automatically inside the hook
   useMailSSE({
     onCountdown: (delayMs) => setCountdownMs(delayMs),

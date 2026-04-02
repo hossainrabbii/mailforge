@@ -1,13 +1,23 @@
-import MainContainer from "@/components/container";
 import Navbar from "@/components/Navbar";
 import WebsitesPage from "@/components/Website";
 import { getAllWebsites } from "@/services/websites";
+import { toast } from "sonner";
 const page = async () => {
-  const { data } = await getAllWebsites();
+  const response = await getAllWebsites();
+
+  if (!response.success) {
+    return (
+      <>
+        <Navbar sectionName="Websites" />
+        <WebsitesPage website={[]} error={response.message} />
+      </>
+    );
+  }
+
   return (
     <>
-      <Navbar sectionName="Website" />
-      <WebsitesPage website={data} />
+      <Navbar sectionName="Websites" />
+      <WebsitesPage website={response.data} error={null} />
     </>
   );
 };
