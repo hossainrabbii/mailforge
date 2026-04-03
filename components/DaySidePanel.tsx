@@ -72,7 +72,15 @@ export function DaySidePanel({ date, emails, onClose }: DaySidePanelProps) {
                   </p>
 
                   <p className="text-xs text-gray-400 mb-2">
-                    <Link href={email?.currentUrl}>{email.currentUrl}</Link>
+                    {/* <Link href={email?.currentUrl}>{email.currentUrl}</Link> */}
+                    {email.currentUrl ? (
+                      <Link href={email.currentUrl as string}>
+                        {" "}
+                        {email.currentUrl}
+                      </Link>
+                    ) : (
+                      <>—</>
+                    )}
                   </p>
 
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">

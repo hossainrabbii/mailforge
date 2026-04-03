@@ -3,7 +3,7 @@ export type MailStatus = "pending" | "processing" | "sent" | "failed";
 export interface Website {
   _id: string;
   name?: string;
-  currentUrl: string;
+  currentUrl?: string;
   remakeUrl?: string;
   mailId: string;
   associateMail?: string;
@@ -12,6 +12,7 @@ export interface Website {
   city?: string;
   mailStatus: MailStatus;
   sentAt?: Date;
+  majorIssues: string;
 }
 
 export interface Template {

@@ -71,11 +71,11 @@ export default function TemplatesPage({ template, error }: IProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   //   const { toast } = useToast();
 
-   useEffect(() => {
-      if (error) {
-        toast.error(error);
-      }
-    }, [error]);
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   const form = useForm<TemplateFormValues>({
     resolver: zodResolver(templateSchema),
@@ -108,6 +108,8 @@ export default function TemplatesPage({ template, error }: IProps) {
         );
 
         toast("Template updated");
+
+        form.reset();
       } else {
         // 🔹 Create new template
         const newTemplate: Template = {
@@ -129,6 +131,7 @@ export default function TemplatesPage({ template, error }: IProps) {
       }
 
       closeDialog();
+      form.reset();
     } catch (error: any) {
       toast(error.message || "Something went wrong");
     }

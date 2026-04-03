@@ -1,6 +1,7 @@
 "use server";
 
-const BASE_URL = "http://localhost:5000/api/v1/templates";
+// const BASE_URL = "http://localhost:5000/api/v1/templates";
+const BASE_URL = `${process.env.NEXT_PUBLIC_BASE_API}/templates`;
 
 /**
  * CREATE Website
@@ -73,7 +74,6 @@ export const getTemplateById = async (id: string) => {
  * UPDATE Website
  */
 export const updateTemplate = async (id: string, payload: any) => {
-
   try {
     const res = await fetch(`${BASE_URL}/${id}`, {
       method: "PATCH",

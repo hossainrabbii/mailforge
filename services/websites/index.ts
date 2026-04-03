@@ -1,6 +1,7 @@
 "use server";
 
-const BASE_URL = "http://localhost:5000/api/v1/websites";
+// const BASE_URL = "http://localhost:5000/api/v1/websites";
+const BASE_URL = `${process.env.NEXT_PUBLIC_BASE_API}/websites`;
 
 /**
  * CREATE Website

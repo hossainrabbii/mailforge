@@ -1,7 +1,7 @@
 "use server";
 import { fetchWithRefresh } from "@/lib/fetchWithRefresh";
 
-const BASE_URL = "http://localhost:5000/api/v1";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_API;
 
 // login does not use fetchWithRefresh — no cookie yet
 export const login = async (email: string, password: string) => {

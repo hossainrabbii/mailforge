@@ -1,6 +1,7 @@
 "use server";
 
-const BASE_URL = "http://localhost:5000/api/v1/mail";
+// const BASE_URL = "http://localhost:5000/api/v1/mail";
+const BASE_URL = `${process.env.NEXT_PUBLIC_BASE_API}/mail`;
 
 /**
  * CREATE Website
@@ -76,7 +77,7 @@ export const getMailById = async (id: string) => {
 /**
  * UPDATE Website
  */
-export const updateMail= async (id: string, payload: any) => {
+export const updateMail = async (id: string, payload: any) => {
   try {
     const res = await fetch(`${BASE_URL}/${id}`, {
       method: "PATCH",

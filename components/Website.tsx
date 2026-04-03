@@ -68,7 +68,7 @@ import Link from "next/link";
 
 const websiteSchema = z.object({
   name: z.string().trim().max(100).optional(),
-  currentUrl: z.string().trim().url("Must be a valid URL"),
+  currentUrl: z.string().trim().optional(),
   remakeUrl: z
     .string()
     .trim()
@@ -80,6 +80,7 @@ const websiteSchema = z.object({
   phone: z.string().trim().max(20).optional(),
   country: z.string().trim().max(50).optional(),
   city: z.string().trim().max(50).optional(),
+  majorIssues: z.string().trim().max(50),
 });
 
 interface IProps {
@@ -107,27 +108,31 @@ export default function WebsitesPage({ website, error }: IProps) {
     resolver: zodResolver(websiteSchema),
     defaultValues: {
       name: "",
-      currentUrl: "",
+      currentUrl: undefined,
       remakeUrl: "",
       mailId: "",
       associateMail: "",
       phone: "",
       country: "",
       city: "",
+      majorIssues: "",
     },
   });
 
   /* ---------------- Filters ---------------- */
   // console.log(website.filter(d))
   const filtered = websites.filter((w) => {
+    const searchText = search.toLowerCase();
+
     const matchesSearch =
       !search ||
-      w.name?.toLowerCase().includes(search.toLowerCase()) ||
-      w.currentUrl.toLowerCase().includes(search.toLowerCase()) ||
-      w.mailId.toLowerCase().includes(search.toLowerCase());
+      w.name?.toLowerCase().includes(searchText) ||
+      w.currentUrl?.toLowerCase().includes(searchText) ||
+      w.mailId?.toLowerCase().includes(searchText);
 
     const matchesStatus =
       statusFilter === "all" || w.mailStatus === statusFilter;
+
     return matchesSearch && matchesStatus;
   });
 
@@ -160,22 +165,26 @@ export default function WebsitesPage({ website, error }: IProps) {
         ),
       );
       toast("Website Updated");
+      form.reset();
     } else {
       const newSite: Website = {
         _id: crypto.randomUUID(),
         ...data,
+        currentUrl: data.currentUrl?.trim() || undefined,
+        associateMail: data.associateMail?.trim() || undefined,
         remakeUrl: data.remakeUrl || undefined,
         mailStatus: "pending",
       };
 
       const response = await createWebsite(data);
-      console.log(response);
+
       if (!response?.success) {
         toast(response?.message);
         return;
       }
       toast("Website Added");
       setWebsites((prev) => [...prev, newSite]);
+      form.reset();
     }
 
     setDialogOpen(false);
@@ -186,13 +195,14 @@ export default function WebsitesPage({ website, error }: IProps) {
     setEditingId(w._id);
     form.reset({
       name: w.name || "",
-      currentUrl: w.currentUrl,
+      currentUrl: w.currentUrl || undefined,
       remakeUrl: w.remakeUrl || "",
       mailId: w.mailId,
       associateMail: w.associateMail || "",
       phone: w.phone || "",
       country: w.country || "",
       city: w.city || "",
+      majorIssues: w.majorIssues || "",
     });
     setDialogOpen(true);
   };
@@ -267,6 +277,7 @@ export default function WebsitesPage({ website, error }: IProps) {
                     "phone",
                     "country",
                     "city",
+                    "majorIssues",
                   ].map((field) => (
                     <FormField
                       key={field}
@@ -274,7 +285,9 @@ export default function WebsitesPage({ website, error }: IProps) {
                       name={field as any}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{field.name}</FormLabel>
+                          <FormLabel className="capitalize">
+                            {field.name}
+                          </FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -320,9 +333,11 @@ export default function WebsitesPage({ website, error }: IProps) {
                     />
                   </TableHead>
                   <TableHead>Name</TableHead>
+                  <TableHead>Major Issues</TableHead>
+                  <TableHead>Email</TableHead>
+
                   <TableHead>Current URL</TableHead>
                   <TableHead>Remake URL</TableHead>
-                  <TableHead>Email</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="w-20">Actions</TableHead>
                 </TableRow>
@@ -338,13 +353,26 @@ export default function WebsitesPage({ website, error }: IProps) {
                       />
                     </TableCell>
                     <TableCell>{w.name || "—"}</TableCell>
-                    <TableCell className="truncate max-w-[200px]">
-                      <Link href={w.currentUrl as string}> {w.currentUrl}</Link>
-                    </TableCell>
-                    <TableCell className="truncate max-w-[200px]">
-                      <Link href={w.remakeUrl as string}> {w.remakeUrl}</Link>
-                    </TableCell>
+                    <TableCell>{w.majorIssues || "—"}</TableCell>
                     <TableCell>{w.mailId}</TableCell>
+
+                    <TableCell className="truncate max-w-[200px]">
+                      {w.currentUrl ? (
+                        <Link href={w.currentUrl as string}>
+                          {" "}
+                          {w.currentUrl}
+                        </Link>
+                      ) : (
+                        <>—</>
+                      )}
+                    </TableCell>
+                    <TableCell className="truncate max-w-[200px]">
+                      {w.remakeUrl ? (
+                        <Link href={w.remakeUrl as string}> {w.remakeUrl}</Link>
+                      ) : (
+                        <>—</>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <StatusBadge status={w.mailStatus} />
                     </TableCell>

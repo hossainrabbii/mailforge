@@ -61,10 +61,12 @@ export default function SendMailPage({ template, website, error }: IProps) {
   });
 
   const filtered = websites.filter((w) => {
+    const searchText = search.toLowerCase();
+
     const matchesSearch =
       !search ||
-      w.name?.toLowerCase().includes(search.toLowerCase()) ||
-      w.currentUrl.toLowerCase().includes(search.toLowerCase());
+      w.name?.toLowerCase().includes(searchText) ||
+      w.currentUrl?.toLowerCase().includes(searchText); // ✅ safe now
 
     const matchesStatus =
       statusFilter === "all" || w.mailStatus === statusFilter;
@@ -74,25 +76,33 @@ export default function SendMailPage({ template, website, error }: IProps) {
 
   const selectedTemplate = templates.find((t) => t._id === selectedTemplateId);
   const firstSelected = websites.find((w) => selectedIds.has(w._id));
-
   const previewHtml = useMemo(() => {
     if (!selectedTemplate || !firstSelected) return "";
+
+    const name = firstSelected.name || "Client";
+    const currentUrl = firstSelected.currentUrl || "";
+    const remakeUrl = firstSelected.remakeUrl || "";
+
     return selectedTemplate.bodyHtml
-      .replace(/\{\{name\}\}/g, firstSelected.name || "Client")
-      .replace(/\{\{currentUrl\}\}/g, firstSelected.currentUrl)
+      .replace(/\{\{name\}\}/g, name)
+      .replace(/\{\{currentUrl\}\}/g, currentUrl)
       .replace(
         /\{\{remakeSection\}\}/g,
-        firstSelected.remakeUrl
-          ? `<p>Check out your redesigned site: <a href="${firstSelected.remakeUrl}">${firstSelected.remakeUrl}</a></p>`
+        remakeUrl
+          ? `<p>Check out your redesigned site: <a href="${remakeUrl}">${remakeUrl}</a></p>`
           : "",
       );
   }, [selectedTemplate, firstSelected]);
 
   const previewSubject = useMemo(() => {
     if (!selectedTemplate || !firstSelected) return "";
+
+    const name = firstSelected.name || "Client";
+    const currentUrl = firstSelected.currentUrl || "";
+
     return selectedTemplate.subject
-      .replace(/\{\{name\}\}/g, firstSelected.name || "Client")
-      .replace(/\{\{currentUrl\}\}/g, firstSelected.currentUrl);
+      .replace(/\{\{name\}\}/g, name)
+      .replace(/\{\{currentUrl\}\}/g, currentUrl);
   }, [selectedTemplate, firstSelected]);
 
   const toggleSelect = (id: string) => {
@@ -167,7 +177,7 @@ export default function SendMailPage({ template, website, error }: IProps) {
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm truncate">
-                    {w.name || w.currentUrl}
+                    {w.name || w.currentUrl} ({w.majorIssues || ""})
                   </p>
                   <p className="text-xs text-muted-foreground truncate">
                     {w.mailId}
