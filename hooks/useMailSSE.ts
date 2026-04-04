@@ -12,7 +12,7 @@ type SSEEvent = MessageEvent<string>;
 
 export const useMailSSE = ({ onCountdown, onDone }: SSEOptions = {}) => {
   useEffect(() => {
-    const es = new EventSource("http://localhost:5000/api/v1/mail/events");
+    const es = new EventSource("https://mailforge-bay.vercel.app/api/v1/mail/events");
 
     es.addEventListener("mail_sent", (e) => {
       const data = JSON.parse((e as SSEEvent).data);
