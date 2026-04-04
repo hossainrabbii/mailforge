@@ -36,7 +36,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import type { Template } from "@/types";
-import { mockTemplates } from "@/lib/mock-data";
 import { Switch } from "./ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { toast } from "sonner";

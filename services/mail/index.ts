@@ -1,13 +1,12 @@
 "use server";
 
-// const BASE_URL = "http://localhost:5000/api/v1/mail";
 const BASE_URL = `${process.env.NEXT_PUBLIC_BASE_API}/mail`;
 
 /**
  * CREATE Website
  */
 interface SendMailPayload {
-  selectedIds: string[]; // was Set<string>
+  selectedIds: string[];
   selectedTemplateId: string;
 }
 export const sendMail = async (payload: SendMailPayload) => {
@@ -27,7 +26,6 @@ export const sendMail = async (payload: SendMailPayload) => {
     return await res.json();
   } catch (
     error: any
-    // console.log(res);
   ) {
     console.log(error);
     throw new Error(error.message);

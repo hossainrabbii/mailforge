@@ -3,7 +3,6 @@ import { fetchWithRefresh } from "@/lib/fetchWithRefresh";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_API;
 
-// login does not use fetchWithRefresh — no cookie yet
 export const login = async (email: string, password: string) => {
   try {
     const res = await fetch(`${BASE_URL}/auth/login`, {
@@ -19,7 +18,6 @@ export const login = async (email: string, password: string) => {
   }
 };
 
-// register does not need cookie either
 export const register = async (email: string, password: string) => {
   try {
     const res = await fetch(`${BASE_URL}/auth/register`, {
@@ -34,7 +32,6 @@ export const register = async (email: string, password: string) => {
   }
 };
 
-// logout and getMe use fetchWithRefresh — need cookie
 export const logout = async () => {
   try {
     return await fetchWithRefresh("/auth/logout", { method: "POST" });

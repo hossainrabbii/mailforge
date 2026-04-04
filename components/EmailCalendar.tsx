@@ -23,7 +23,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DaySidePanel } from "@/components/DaySidePanel";
-// import { website } from "@/lib/mock-data";
 import { Website } from "@/types";
 
 const MONTHS = [
@@ -47,24 +46,22 @@ interface IProps {
 export function EmailCalendar({ website }: IProps) {
   const DAY_HEADERS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-  // EDITED: dynamic years around current year instead of hardcoded
   const currentYear = new Date().getFullYear();
   const YEARS = [currentYear - 1, currentYear, currentYear + 1];
 
-  // EDITED: handle sentAt as Date | undefined, not string
   function getEmailCountForDay(date: Date): number {
     const key = format(date, "yyyy-MM-dd");
     return website.filter((e) => {
-      if (!e.sentAt) return false; // EDITED: guard for undefined
-      return format(new Date(e.sentAt), "yyyy-MM-dd") === key; // EDITED: convert Date to string for comparison
+      if (!e.sentAt) return false; 
+      return format(new Date(e.sentAt), "yyyy-MM-dd") === key; 
     }).length;
   }
 
   function getEmailsForDay(date: Date) {
     const key = format(date, "yyyy-MM-dd");
     return website.filter((e) => {
-      if (!e.sentAt) return false; // EDITED: guard for undefined
-      return format(new Date(e.sentAt), "yyyy-MM-dd") === key; // EDITED: convert Date to string for comparison
+      if (!e.sentAt) return false;
+      return format(new Date(e.sentAt), "yyyy-MM-dd") === key;
     });
   }
 
@@ -81,12 +78,10 @@ export function EmailCalendar({ website }: IProps) {
       "hsl(38 92% 50%)",
     ];
   }
-  // EDITED: start with current date instead of hardcoded Dec 2025
   const today = new Date();
   const [currentDate, setCurrentDate] = useState(
     new Date(today.getFullYear(), today.getMonth(), 1),
   );
-  // EDITED: highlight today by default
   const [selectedDay, setSelectedDay] = useState<Date | null>(today);
 
   const calendarDays = useMemo(() => {

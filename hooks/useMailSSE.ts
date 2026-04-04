@@ -8,7 +8,6 @@ interface SSEOptions {
   onDone?: () => void;
 }
 
-// NEW: cast helper so TypeScript knows SSE events have .data
 type SSEEvent = MessageEvent<string>;
 
 export const useMailSSE = ({ onCountdown, onDone }: SSEOptions = {}) => {
@@ -37,7 +36,6 @@ export const useMailSSE = ({ onCountdown, onDone }: SSEOptions = {}) => {
       onDone?.();
     });
 
-    // NEW: connection-level error (no .data here — it's a plain Event)
     es.onerror = () => {
       toast.error("Connection lost. Retrying...");
     };

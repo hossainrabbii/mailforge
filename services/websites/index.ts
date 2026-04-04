@@ -1,6 +1,5 @@
 "use server";
 
-// const BASE_URL = "http://localhost:5000/api/v1/websites";
 const BASE_URL = `${process.env.NEXT_PUBLIC_BASE_API}/websites`;
 
 /**
@@ -20,7 +19,6 @@ export const createWebsite = async (payload: any) => {
     const data = await res.json();
     if (!res.ok) {
       return data;
-      // throw new Error("Failed to create website");
     }
 
     return data;
@@ -39,12 +37,11 @@ export const getAllWebsites = async () => {
     const res = await fetch(BASE_URL, {
       method: "GET",
       cache: "no-store",
-      credentials: "include", // NEW: send cookies
+      credentials: "include", 
     });
 
     const data = await res.json();
 
-    // EDITED: return error message from backend instead of generic throw
     if (!res.ok) {
       return {
         success: false,
@@ -55,7 +52,6 @@ export const getAllWebsites = async () => {
 
     return { success: true, data: data.data, message: null };
   } catch (error: any) {
-    // network error — server completely unreachable
     return {
       success: false,
       message: "Network error — is the server running?",

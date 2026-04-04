@@ -28,7 +28,6 @@ import { StatusBadge } from "@/components/StatusBadge";
 import type { Website, Template } from "@/types";
 import { toast } from "sonner";
 import { sendMail } from "@/services/mail";
-// NEW: import SSE hook and countdown circle
 import { useMailSSE } from "@/hooks/useMailSSE";
 import { CountdownCircle } from "@/components/CountdownCircle";
 
@@ -46,7 +45,6 @@ export default function SendMailPage({ template, website, error }: IProps) {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<MailStatus>("pending");
-  // NEW: stores countdown ms when backend is waiting between mails
   const [countdownMs, setCountdownMs] = useState<number | null>(null);
 
   useEffect(() => {
@@ -54,10 +52,9 @@ export default function SendMailPage({ template, website, error }: IProps) {
       toast.error(error);
     }
   }, [error]);
-  // NEW: connect to SSE — toasts fire automatically inside the hook
   useMailSSE({
     onCountdown: (delayMs) => setCountdownMs(delayMs),
-    onDone: () => setCountdownMs(null), // hide circle when all done
+    onDone: () => setCountdownMs(null), 
   });
 
   const filtered = websites.filter((w) => {
@@ -66,8 +63,7 @@ export default function SendMailPage({ template, website, error }: IProps) {
     const matchesSearch =
       !search ||
       w.name?.toLowerCase().includes(searchText) ||
-      w.currentUrl?.toLowerCase().includes(searchText); // ✅ safe now
-
+      w.currentUrl?.toLowerCase().includes(searchText); 
     const matchesStatus =
       statusFilter === "all" || w.mailStatus === statusFilter;
 
@@ -124,7 +120,6 @@ export default function SendMailPage({ template, website, error }: IProps) {
 
   return (
     <div className="space-y-4">
-      {/* NEW: countdown circle — only visible while waiting between mails */}
       {countdownMs && (
         <div className="flex justify-center py-2">
           <CountdownCircle delayMs={countdownMs} />
@@ -132,12 +127,11 @@ export default function SendMailPage({ template, website, error }: IProps) {
       )}
 
       <div className="grid gap-6 lg:grid-cols-2 h-full">
-        {/* Left: Website selection — unchanged */}
         <Card className="shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Select Recipients</CardTitle>
             <div className="flex gap-2 mt-2">
-              {/* Search */}
+           
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -148,7 +142,6 @@ export default function SendMailPage({ template, website, error }: IProps) {
                 />
               </div>
 
-              {/* Status Filter */}
               <Select
                 value={statusFilter}
                 onValueChange={(value) => setStatusFilter(value as MailStatus)}

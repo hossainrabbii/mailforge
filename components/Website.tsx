@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Plus, Search, Trash2, Pencil } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -32,22 +31,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-
-// import { useToast } from "@/hooks/use-toast";
 import type { Website } from "@/types";
-import { StatusBadge } from "./StatusBadge";
-import { mockWebsites } from "@/lib/mock-data";
+import { StatusBadge } from "./StatusBadge";;
 import {
   Form,
   FormControl,

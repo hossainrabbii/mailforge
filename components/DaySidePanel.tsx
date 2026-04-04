@@ -3,12 +3,12 @@
 import { format } from "date-fns";
 import { X, Mail, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Website } from "@/types"; // EDITED: use Website type instead of EmailRecord
+import { Website } from "@/types"; 
 import Link from "next/link";
 
 interface DaySidePanelProps {
   date: Date;
-  emails: Website[]; // EDITED: was EmailRecord[]
+  emails: Website[]; 
   onClose: () => void;
 }
 

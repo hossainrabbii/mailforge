@@ -1,6 +1,5 @@
 import { HeroPanel } from "@/components/HeroPanel";
 import { SignupForm } from "@/components/SignupForm";
-import Image from "next/image";
 
 export default function Home() {
   return (

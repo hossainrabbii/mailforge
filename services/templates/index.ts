@@ -1,6 +1,5 @@
 "use server";
 
-// const BASE_URL = "http://localhost:5000/api/v1/templates";
 const BASE_URL = `${process.env.NEXT_PUBLIC_BASE_API}/templates`;
 
 /**
@@ -23,7 +22,6 @@ export const createTemplate = async (payload: any) => {
     return await res.json();
   } catch (
     error: any
-    // console.log(res);
   ) {
     console.log(error);
     throw new Error(error.message);

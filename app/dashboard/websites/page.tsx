@@ -1,7 +1,6 @@
 import Navbar from "@/components/Navbar";
 import WebsitesPage from "@/components/Website";
 import { getAllWebsites } from "@/services/websites";
-import { toast } from "sonner";
 const page = async () => {
   const response = await getAllWebsites();
 

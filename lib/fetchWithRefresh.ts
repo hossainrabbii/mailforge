@@ -1,12 +1,11 @@
 import { cookies } from "next/headers";
 
-const BASE_URL = "http://localhost:5000/api/v1";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_API;
 
 export const fetchWithRefresh = async (
   endpoint: string,
   options: RequestInit = {},
 ): Promise<any> => {
-  // NEW: forward browser cookies to backend
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.toString();
 
@@ -17,13 +16,12 @@ export const fetchWithRefresh = async (
       headers: {
         "Content-Type": "application/json",
         ...options.headers,
-        Cookie: cookieHeader, // forward cookies
+        Cookie: cookieHeader,
       },
     });
 
   let res = await makeRequest();
 
-  // NEW: if 401 → refresh → retry once
   if (res.status === 401) {
     const refresh = await fetch(`${BASE_URL}/auth/refresh`, {
       method: "POST",

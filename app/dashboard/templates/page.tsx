@@ -1,4 +1,4 @@
-import MainContainer from "@/components/container";
+
 import Navbar from "@/components/Navbar";
 import TemplatesPage from "@/components/Template";
 import { getAllTemplates } from "@/services/templates";
