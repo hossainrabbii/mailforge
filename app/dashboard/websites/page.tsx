@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import Navbar from "@/components/Navbar";
 import WebsitesPage from "@/components/Website";
 import { getAllWebsites } from "@/services/websites";

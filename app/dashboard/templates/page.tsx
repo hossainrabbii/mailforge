@@ -1,4 +1,4 @@
-
+export const dynamic = "force-dynamic";
 import Navbar from "@/components/Navbar";
 import TemplatesPage from "@/components/Template";
 import { getAllTemplates } from "@/services/templates";
