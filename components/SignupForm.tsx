@@ -101,7 +101,7 @@ export function SignupForm() {
             <button
               type="button"
               onClick={() => setTab("login")}
-              className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium transition-colors ${
+              className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium transition-colors border ${
                 tab === "login"
                   ? "bg-foreground text-background"
                   : "text-muted-foreground hover:text-foreground"
@@ -171,7 +171,7 @@ export function SignupForm() {
 
               <Button
                 type="submit"
-                className="w-full h-12 rounded-full bg-brand-orange hover:bg-brand-orange/90 text-brand-orange-foreground text-sm font-semibold"
+                className="w-full h-12 rounded-full bg-brand-orange hover:bg-brand-orange/90 text-brand-orange-foreground text-sm font-semibold shadow-md"
               >
                 Create an Account
               </Button>
@@ -234,10 +234,9 @@ export function SignupForm() {
                   </FormItem>
                 )}
               />
-
               <Button
                 type="submit"
-                className="w-full h-12 rounded-full bg-brand-orange hover:bg-brand-orange/90 text-brand-orange-foreground text-sm font-semibold"
+                className="w-full h-12 rounded-full bg-brand-orange hover:bg-brand-orange/90 text-brand-orange-foreground text-sm font-semibold shadow-md"
               >
                 Log In
               </Button>
