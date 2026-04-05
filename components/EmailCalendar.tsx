@@ -52,8 +52,8 @@ export function EmailCalendar({ website }: IProps) {
   function getEmailCountForDay(date: Date): number {
     const key = format(date, "yyyy-MM-dd");
     return website.filter((e) => {
-      if (!e.sentAt) return false; 
-      return format(new Date(e.sentAt), "yyyy-MM-dd") === key; 
+      if (!e.sentAt) return false;
+      return format(new Date(e.sentAt), "yyyy-MM-dd") === key;
     }).length;
   }
 
@@ -107,10 +107,10 @@ export function EmailCalendar({ website }: IProps) {
     <>
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Email Activity
+          Daily Activity
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Track your daily email sending activity
+          Daily email sending activity
         </p>
       </div>
       <div className="flex items-start gap-6 flex-col lg:flex-row">

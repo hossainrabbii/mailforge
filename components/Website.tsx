@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/select";
 
 import type { Website } from "@/types";
-import { StatusBadge } from "./StatusBadge";;
+import { StatusBadge } from "./StatusBadge";
 import {
   Form,
   FormControl,
@@ -78,7 +78,7 @@ type WebsiteFormValues = z.infer<typeof websiteSchema>;
 export default function WebsitesPage({ website, error }: IProps) {
   const [websites, setWebsites] = useState<Website[]>(website);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("pending");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -116,7 +116,7 @@ export default function WebsitesPage({ website, error }: IProps) {
       w.mailId?.toLowerCase().includes(searchText);
 
     const matchesStatus =
-      statusFilter === "pending" || w.mailStatus === statusFilter;
+      statusFilter === "all" || w.mailStatus === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
