@@ -116,7 +116,7 @@ export default function WebsitesPage({ website, error }: IProps) {
       w.mailId?.toLowerCase().includes(searchText);
 
     const matchesStatus =
-      statusFilter === "all" || w.mailStatus === statusFilter;
+      statusFilter === "pending" || w.mailStatus === statusFilter;
 
     return matchesSearch && matchesStatus;
   });

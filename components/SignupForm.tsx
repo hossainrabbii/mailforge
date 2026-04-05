@@ -47,15 +47,23 @@ export function SignupForm() {
   });
 
   const onRegister = async (data: RegisterValues) => {
-    const response = await registerUser(data?.email, data?.password);
-    if (!response?.success) {
-      toast.warning(response?.message);
-      return;
-    }
-    toast.success(response?.message);
-    router.push("/dashboard");
-  };
+    try {
+      const response = await registerUser(data.email, data.password);
 
+      if (!response?.success) {
+        toast.warning(response?.message || "Registration failed");
+        return;
+      }
+
+      toast.success(response.message);
+
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 100); // avoids race condition
+    } catch (err) {
+      toast.error("Something went wrong");
+    }
+  };
   const onLogin = async (data: LoginValues) => {
     const response = await loginUser(data?.email, data?.password);
     if (!response?.success) {

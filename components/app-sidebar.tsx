@@ -16,9 +16,9 @@ import {
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Websites", href: "/dashboard/websites", icon: Globe },
+  { name: "Leads", href: "/dashboard/leads", icon: Globe },
   { name: "Templates", href: "/dashboard/templates", icon: FileText },
-  { name: "Send Mail", href: "/dashboard/send-mail", icon: Send },
+  { name: "Out Reach", href: "/dashboard/out-reach", icon: Send },
 ];
 
 export default function AppSidebar() {
