@@ -13,6 +13,7 @@ const clearAccessToken = () => {
 };
 
 export const register = async (email: string, password: string) => {
+  console.log("Reg Frontend:", email);
   try {
     const res = await fetch(`${BASE_URL}/auth/register`, {
       method: "POST",
