@@ -21,8 +21,8 @@ export const register = async (email: string, password: string) => {
       body: JSON.stringify({ email, password }),
       credentials: "include",
     });
-
     const data = await res.json();
+    console.log(data);
 
     if (data.success && data.accessToken) {
       saveAccessToken(data.accessToken);
