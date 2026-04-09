@@ -35,6 +35,7 @@ export const register = async (email: string, password: string) => {
 
 export const login = async (email: string, password: string) => {
   console.log(email);
+  console.log(BASE_URL);
   try {
     const res = await fetch(`${BASE_URL}/auth/login`, {
       method: "POST",
