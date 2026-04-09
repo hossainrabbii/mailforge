@@ -30,7 +30,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import type { Website } from "@/types";
 import { StatusBadge } from "./StatusBadge";
 import {
@@ -41,15 +40,9 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
-import {
-  createWebsite,
-  deleteWebsite,
-  updateWebsite,
-} from "@/services/websites";
+import { createWebsite, deleteWebsite, updateWebsite } from "@/services/websites";
 import { toast } from "sonner";
 import Link from "next/link";
-
-/* ---------------- Schema ---------------- */
 
 const websiteSchema = z.object({
   name: z.string().trim().max(100).optional(),
@@ -75,6 +68,19 @@ interface IProps {
 
 type WebsiteFormValues = z.infer<typeof websiteSchema>;
 
+// FIXED: all fields default to "" never undefined
+const emptyForm: WebsiteFormValues = {
+  name: "",
+  currentUrl: "", // FIXED: was undefined
+  remakeUrl: "",
+  mailId: "",
+  associateMail: "",
+  phone: "",
+  country: "",
+  city: "",
+  majorIssues: "",
+};
+
 export default function WebsitesPage({ website, error }: IProps) {
   const [websites, setWebsites] = useState<Website[]>(website);
   const [search, setSearch] = useState("");
@@ -84,44 +90,25 @@ export default function WebsitesPage({ website, error }: IProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
+    if (error) toast.error(error);
   }, [error]);
 
   const form = useForm<WebsiteFormValues>({
     resolver: zodResolver(websiteSchema),
-    defaultValues: {
-      name: "",
-      currentUrl: undefined,
-      remakeUrl: "",
-      mailId: "",
-      associateMail: "",
-      phone: "",
-      country: "",
-      city: "",
-      majorIssues: "",
-    },
+    defaultValues: emptyForm, // FIXED: use emptyForm constant
   });
 
-  /* ---------------- Filters ---------------- */
-  // console.log(website.filter(d))
   const filtered = websites.filter((w) => {
     const searchText = search.toLowerCase();
-
     const matchesSearch =
       !search ||
       w.name?.toLowerCase().includes(searchText) ||
       w.currentUrl?.toLowerCase().includes(searchText) ||
       w.mailId?.toLowerCase().includes(searchText);
-
     const matchesStatus =
       statusFilter === "all" || w.mailStatus === statusFilter;
-
     return matchesSearch && matchesStatus;
   });
-
-  /* ---------------- Handlers ---------------- */
 
   const toggleSelect = (id: string) => {
     const next = new Set(selected);
@@ -133,15 +120,14 @@ export default function WebsitesPage({ website, error }: IProps) {
     if (selected.size === filtered.length) setSelected(new Set());
     else setSelected(new Set(filtered.map((w) => w._id)));
   };
+
   const onSubmit = async (data: WebsiteFormValues) => {
     if (editingId) {
-      // fix: was "values" → should be "data"
       const response = await updateWebsite(editingId, data);
       if (!response?.success) {
-        toast("Something went wrong");
+        toast.error(response?.message || "Something went wrong");
         return;
       }
-      // update local state after success
       setWebsites((prev) =>
         prev.map((w) =>
           w._id === editingId
@@ -149,40 +135,41 @@ export default function WebsitesPage({ website, error }: IProps) {
             : w,
         ),
       );
-      toast("Website Updated");
-      form.reset();
+      toast.success("Website Updated");
     } else {
-      const newSite: Website = {
-        _id: crypto.randomUUID(),
-        ...data,
-        currentUrl: data.currentUrl?.trim() || undefined,
-        associateMail: data.associateMail?.trim() || undefined,
-        remakeUrl: data.remakeUrl || undefined,
-        mailStatus: "pending",
-      };
-
       const response = await createWebsite(data);
-
       if (!response?.success) {
-        toast(response?.message);
+        toast.error(response?.message);
         return;
       }
-      toast("Website Added");
-      setWebsites((prev) => [...prev, newSite]);
-      form.reset();
+      toast.success("Website Added");
+      setWebsites((prev) => [
+        ...prev,
+        {
+          _id: crypto.randomUUID(),
+          ...data,
+          currentUrl: data.currentUrl?.trim() || undefined,
+          associateMail: data.associateMail?.trim() || undefined,
+          remakeUrl: data.remakeUrl || undefined,
+          mailStatus: "pending",
+        },
+      ]);
     }
 
+    // FIXED: always reset to emptyForm — no undefined values
     setDialogOpen(false);
     setEditingId(null);
-    form.reset();
+    form.reset(emptyForm);
   };
+
   const handleEdit = (w: Website) => {
     setEditingId(w._id);
+    // FIXED: all fields fallback to "" never undefined
     form.reset({
       name: w.name || "",
-      currentUrl: w.currentUrl || undefined,
+      currentUrl: w.currentUrl || "", // FIXED: was undefined
       remakeUrl: w.remakeUrl || "",
-      mailId: w.mailId,
+      mailId: w.mailId || "",
       associateMail: w.associateMail || "",
       phone: w.phone || "",
       country: w.country || "",
@@ -195,14 +182,12 @@ export default function WebsitesPage({ website, error }: IProps) {
   const handleDelete = async (id: string) => {
     const res = await deleteWebsite(id);
     if (!res?.success) {
-      toast(res?.message);
+      toast.error(res?.message);
       return;
     }
     toast.warning(res?.message);
     setWebsites((prev) => prev.filter((w) => w._id !== id));
   };
-
-  /* ---------------- UI ---------------- */
 
   return (
     <div className="space-y-4 p-4">
@@ -233,7 +218,17 @@ export default function WebsitesPage({ website, error }: IProps) {
           </Select>
         </div>
 
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <Dialog
+          open={dialogOpen}
+          onOpenChange={(open) => {
+            setDialogOpen(open);
+            // FIXED: reset form when dialog closes
+            if (!open) {
+              setEditingId(null);
+              form.reset(emptyForm);
+            }
+          }}
+        >
           <DialogTrigger asChild>
             <Button size="sm">
               <Plus className="h-4 w-4 mr-1" /> Add Website
@@ -263,18 +258,19 @@ export default function WebsitesPage({ website, error }: IProps) {
                     "country",
                     "city",
                     "majorIssues",
-                  ].map((field) => (
+                  ].map((fieldName) => (
                     <FormField
-                      key={field}
+                      key={fieldName}
                       control={form.control}
-                      name={field as any}
+                      name={fieldName as any}
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="capitalize">
-                            {field.name}
+                            {fieldName}
                           </FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            {/* FIXED: always fallback to "" */}
+                            <Input {...field} value={field.value ?? ""} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -287,7 +283,11 @@ export default function WebsitesPage({ website, error }: IProps) {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setDialogOpen(false)}
+                    onClick={() => {
+                      setDialogOpen(false);
+                      setEditingId(null);
+                      form.reset(emptyForm);
+                    }}
                   >
                     Cancel
                   </Button>
@@ -301,87 +301,80 @@ export default function WebsitesPage({ website, error }: IProps) {
 
       {/* Table */}
       <div className="border rounded-lg">
-        {filtered?.length == 0 ? (
+        {filtered?.length === 0 ? (
           <p className="p-4">No data found</p>
         ) : (
-          <>
-            {" "}
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-10">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={
+                      filtered.length > 0 &&
+                      selected.size === filtered.length
+                    }
+                    onCheckedChange={toggleAll}
+                  />
+                </TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Major Issues</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Current URL</TableHead>
+                <TableHead>Remake URL</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="w-20">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {filtered.map((w) => (
+                <TableRow key={w._id}>
+                  <TableCell>
                     <Checkbox
-                      checked={
-                        filtered.length > 0 && selected.size === filtered.length
-                      }
-                      onCheckedChange={toggleAll}
+                      checked={selected.has(w._id)}
+                      onCheckedChange={() => toggleSelect(w._id)}
                     />
-                  </TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Major Issues</TableHead>
-                  <TableHead>Email</TableHead>
-
-                  <TableHead>Current URL</TableHead>
-                  <TableHead>Remake URL</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-20">Actions</TableHead>
+                  </TableCell>
+                  <TableCell>{w.name || "—"}</TableCell>
+                  <TableCell>{w.majorIssues || "—"}</TableCell>
+                  <TableCell>{w.mailId}</TableCell>
+                  <TableCell className="truncate max-w-[200px]">
+                    {w.currentUrl ? (
+                      <Link href={w.currentUrl}>{w.currentUrl}</Link>
+                    ) : (
+                      <>—</>
+                    )}
+                  </TableCell>
+                  <TableCell className="truncate max-w-[200px]">
+                    {w.remakeUrl ? (
+                      <Link href={w.remakeUrl}>{w.remakeUrl}</Link>
+                    ) : (
+                      <>—</>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={w.mailStatus} />
+                  </TableCell>
+                  <TableCell className="flex gap-1">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => handleEdit(w)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => handleDelete(w._id)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-
-              <TableBody>
-                {filtered.map((w) => (
-                  <TableRow key={w._id}>
-                    <TableCell>
-                      <Checkbox
-                        checked={selected.has(w._id)}
-                        onCheckedChange={() => toggleSelect(w._id)}
-                      />
-                    </TableCell>
-                    <TableCell>{w.name || "—"}</TableCell>
-                    <TableCell>{w.majorIssues || "—"}</TableCell>
-                    <TableCell>{w.mailId}</TableCell>
-
-                    <TableCell className="truncate max-w-[200px]">
-                      {w.currentUrl ? (
-                        <Link href={w.currentUrl as string}>
-                          {" "}
-                          {w.currentUrl}
-                        </Link>
-                      ) : (
-                        <>—</>
-                      )}
-                    </TableCell>
-                    <TableCell className="truncate max-w-[200px]">
-                      {w.remakeUrl ? (
-                        <Link href={w.remakeUrl as string}> {w.remakeUrl}</Link>
-                      ) : (
-                        <>—</>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={w.mailStatus} />
-                    </TableCell>
-                    <TableCell className="flex gap-1">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => handleEdit(w)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => handleDelete(w._id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </>
+              ))}
+            </TableBody>
+          </Table>
         )}
       </div>
     </div>

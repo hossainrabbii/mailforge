@@ -4,7 +4,7 @@ import WebsitesPage from "@/components/Website";
 import { getAllWebsites } from "@/services/websites";
 const page = async () => {
   const response = await getAllWebsites();
-
+  // console.log(response);
   if (!response.success) {
     return (
       <>

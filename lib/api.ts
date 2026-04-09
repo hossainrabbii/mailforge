@@ -22,6 +22,13 @@ export const api = async (
 
   let res = await makeRequest(accessToken);
 
+  // NEW: check if middleware refreshed the token
+  const newTokenFromMiddleware = res.headers.get("x-new-access-token");
+  if (newTokenFromMiddleware) {
+    localStorage.setItem("accessToken", newTokenFromMiddleware);
+    document.cookie = `accessToken=${newTokenFromMiddleware}; path=/; max-age=${2 * 60 * 60}`;
+  }
+
   if (res.status === 401) {
     const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
       method: "POST",
@@ -38,9 +45,8 @@ export const api = async (
     const refreshData = await refreshRes.json();
     const newAccessToken = refreshData.accessToken;
 
-    // NEW: update both localStorage and cookie
     localStorage.setItem("accessToken", newAccessToken);
-    document.cookie = `accessToken=${newAccessToken}; path=/; max-age=${15 * 60}`;
+    document.cookie = `accessToken=${newAccessToken}; path=/; max-age=${2 * 60 * 60}`;
 
     res = await makeRequest(newAccessToken);
   }

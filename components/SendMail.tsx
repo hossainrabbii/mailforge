@@ -54,7 +54,7 @@ export default function SendMailPage({ template, website, error }: IProps) {
   }, [error]);
   useMailSSE({
     onCountdown: (delayMs) => setCountdownMs(delayMs),
-    onDone: () => setCountdownMs(null), 
+    onDone: () => setCountdownMs(null),
   });
 
   const filtered = websites.filter((w) => {
@@ -63,7 +63,7 @@ export default function SendMailPage({ template, website, error }: IProps) {
     const matchesSearch =
       !search ||
       w.name?.toLowerCase().includes(searchText) ||
-      w.currentUrl?.toLowerCase().includes(searchText); 
+      w.currentUrl?.toLowerCase().includes(searchText);
     const matchesStatus =
       statusFilter === "all" || w.mailStatus === statusFilter;
 
@@ -131,7 +131,6 @@ export default function SendMailPage({ template, website, error }: IProps) {
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Select Recipients</CardTitle>
             <div className="flex gap-2 mt-2">
-           
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -170,13 +169,18 @@ export default function SendMailPage({ template, website, error }: IProps) {
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm truncate">
-                    {w.name || w.currentUrl} ({w.majorIssues || ""})
+                    {w.name || w.currentUrl}
                   </p>
                   <p className="text-xs text-muted-foreground truncate">
                     {w.mailId}
                   </p>
                 </div>
-                <StatusBadge status={w.mailStatus} />
+                <div className="flex gap-2">
+                  <small>
+                    <strong>{w.majorIssues || ""}</strong>
+                  </small>{" "}
+                  <StatusBadge status={w.mailStatus} />
+                </div>
               </label>
             ))}
             {filtered.length === 0 && (

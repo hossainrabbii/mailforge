@@ -1,5 +1,7 @@
 "use server";
 
+import { fetchWithRefresh } from "@/lib/fetchWithRefresh";
+
 const BASE_URL = `${process.env.NEXT_PUBLIC_BASE_API}/websites`;
 
 /**
@@ -34,15 +36,12 @@ export const createWebsite = async (payload: any) => {
 
 export const getAllWebsites = async () => {
   try {
-    const res = await fetch(BASE_URL, {
+    const data = await fetchWithRefresh("/websites", {
       method: "GET",
-      cache: "no-store",
-      credentials: "include", 
+      credentials: "include",
     });
 
-    const data = await res.json();
-
-    if (!res.ok) {
+    if (!data.success) {
       return {
         success: false,
         message: data.message || "Failed to fetch websites",
@@ -50,7 +49,7 @@ export const getAllWebsites = async () => {
       };
     }
 
-    return { success: true, data: data.data, message: null };
+    return data;
   } catch (error: any) {
     return {
       success: false,

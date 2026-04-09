@@ -3,9 +3,9 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_API;
 // helper to save accessToken in both places
 const saveAccessToken = (token: string) => {
   localStorage.setItem("accessToken", token);
-  document.cookie = `accessToken=${token}; path=/; max-age=${15 * 60}`; // 15 mins
+  // FIXED: was 15 * 60 (15 mins) — now matches 2h token lifetime
+  document.cookie = `accessToken=${token}; path=/; max-age=${2 * 60 * 60}`;
 };
-
 const clearAccessToken = () => {
   localStorage.removeItem("accessToken");
   // clear cookie too
@@ -22,7 +22,6 @@ export const register = async (email: string, password: string) => {
       credentials: "include",
     });
     const data = await res.json();
-    console.log(data);
 
     if (data.success && data.accessToken) {
       saveAccessToken(data.accessToken);
@@ -46,7 +45,7 @@ export const login = async (email: string, password: string) => {
     const data = await res.json();
 
     if (data.success && data.accessToken) {
-      saveAccessToken(data.accessToken); // NEW
+      saveAccessToken(data.accessToken);
     }
 
     return data;

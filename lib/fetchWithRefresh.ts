@@ -7,9 +7,9 @@ export const fetchWithRefresh = async (
   endpoint: string,
   options: RequestInit = {},
 ): Promise<any> => {
+  // console.log(endpoint, options);
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.toString();
-
   const makeRequest = async () =>
     fetch(`${BASE_URL}${endpoint}`, {
       ...options,
@@ -22,7 +22,7 @@ export const fetchWithRefresh = async (
     });
 
   let res = await makeRequest();
-
+  // console.log(res.json());
   if (res.status === 401) {
     const refresh = await fetch(`${BASE_URL}/auth/refresh`, {
       method: "POST",

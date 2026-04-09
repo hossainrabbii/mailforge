@@ -20,10 +20,7 @@ export const createTemplate = async (payload: any) => {
     }
 
     return await res.json();
-  } catch (
-    error: any
-  ) {
-    console.log(error);
+  } catch (error: any) {
     throw new Error(error.message);
   }
 };
