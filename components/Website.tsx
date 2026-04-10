@@ -40,7 +40,11 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
-import { createWebsite, deleteWebsite, updateWebsite } from "@/services/websites";
+import {
+  createWebsite,
+  deleteWebsite,
+  updateWebsite,
+} from "@/services/websites";
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -310,8 +314,7 @@ export default function WebsitesPage({ website, error }: IProps) {
                 <TableHead className="w-10">
                   <Checkbox
                     checked={
-                      filtered.length > 0 &&
-                      selected.size === filtered.length
+                      filtered.length > 0 && selected.size === filtered.length
                     }
                     onCheckedChange={toggleAll}
                   />
@@ -335,7 +338,12 @@ export default function WebsitesPage({ website, error }: IProps) {
                       onCheckedChange={() => toggleSelect(w._id)}
                     />
                   </TableCell>
-                  <TableCell>{w.name || "—"}</TableCell>
+                  <TableCell
+                    className="truncate max-w-[200px]"
+                    title={w.name || "—"}
+                  >
+                    {w.name || "—"}
+                  </TableCell>
                   <TableCell>{w.majorIssues || "—"}</TableCell>
                   <TableCell>{w.mailId}</TableCell>
                   <TableCell className="truncate max-w-[200px]">
