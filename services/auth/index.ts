@@ -53,8 +53,12 @@ export const login = async (email: string, password: string) => {
     }
 
     return data;
-  } catch {
-    return { success: false, message: "Network error" };
+  } catch (error: any) {
+    // this will tell you EXACTLY what's failing
+    console.error("EXACT ERROR:", error);
+    console.error("ERROR NAME:", error.name);
+    console.error("ERROR MESSAGE:", error.message);
+    return { success: false, message: error.message || "Network error" };
   }
 };
 
