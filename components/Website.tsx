@@ -134,7 +134,6 @@ export default function WebsitesPage({ website, error }: IProps) {
         toast.error(response?.message || "Something went wrong");
         return;
       }
-      setDisableSubmitBtn(false);
       setWebsites((prev) =>
         prev.map((w) =>
           w._id === editingId
@@ -161,9 +160,9 @@ export default function WebsitesPage({ website, error }: IProps) {
           mailStatus: "pending",
         },
       ]);
-      setDisableSubmitBtn(false);
     }
 
+    setDisableSubmitBtn(false);
     // FIXED: always reset to emptyForm — no undefined values
     setDialogOpen(false);
     setEditingId(null);

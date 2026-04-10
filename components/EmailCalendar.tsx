@@ -216,7 +216,7 @@ export function EmailCalendar({ website }: IProps) {
                           className={`block h-[5px] w-[5px] rounded-full ${isSelected ? "opacity-80" : ""}`}
                           style={{
                             backgroundColor: isSelected
-                              ? "hsl(var(--primary-foreground))"
+                              ? `hsl(var(--primary-foreground)) ${color}`
                               : color,
                           }}
                         />
