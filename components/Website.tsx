@@ -91,6 +91,7 @@ export default function WebsitesPage({ website, error }: IProps) {
   const [statusFilter, setStatusFilter] = useState("pending");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [disableSubmitBtn, setDisableSubmitBtn] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -126,12 +127,14 @@ export default function WebsitesPage({ website, error }: IProps) {
   };
 
   const onSubmit = async (data: WebsiteFormValues) => {
+    setDisableSubmitBtn(true);
     if (editingId) {
       const response = await updateWebsite(editingId, data);
       if (!response?.success) {
         toast.error(response?.message || "Something went wrong");
         return;
       }
+      setDisableSubmitBtn(false);
       setWebsites((prev) =>
         prev.map((w) =>
           w._id === editingId
@@ -139,14 +142,14 @@ export default function WebsitesPage({ website, error }: IProps) {
             : w,
         ),
       );
-      toast.success("Website Updated");
+      toast.success("Website Updated.");
     } else {
       const response = await createWebsite(data);
       if (!response?.success) {
         toast.error(response?.message);
         return;
       }
-      toast.success("Website Added");
+      toast.success("Website Added.");
       setWebsites((prev) => [
         ...prev,
         {
@@ -158,6 +161,7 @@ export default function WebsitesPage({ website, error }: IProps) {
           mailStatus: "pending",
         },
       ]);
+      setDisableSubmitBtn(false);
     }
 
     // FIXED: always reset to emptyForm — no undefined values
@@ -295,7 +299,9 @@ export default function WebsitesPage({ website, error }: IProps) {
                   >
                     Cancel
                   </Button>
-                  <Button type="submit">{editingId ? "Update" : "Add"}</Button>
+                  <Button disabled={disableSubmitBtn} type="submit">
+                    {editingId ? "Update" : "Add"}
+                  </Button>
                 </div>
               </form>
             </Form>
