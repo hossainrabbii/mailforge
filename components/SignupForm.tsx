@@ -16,6 +16,7 @@ import {
 import { register as registerUser, login as loginUser } from "@/services/auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Spinner } from "./ui/spinner";
 
 const registerSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -34,6 +35,7 @@ type TabType = "register" | "login";
 export function SignupForm() {
   const [tab, setTab] = useState<TabType>("register");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
   const registerForm = useForm<RegisterValues>({
@@ -46,7 +48,10 @@ export function SignupForm() {
     defaultValues: { email: "", password: "" },
   });
 
+  setLoading(true);
   const onRegister = async (data: RegisterValues) => {
+    setLoading(true);
+
     try {
       const response = await registerUser(data.email, data.password);
 
@@ -63,8 +68,10 @@ export function SignupForm() {
     } catch (err) {
       toast.error("Something went wrong");
     }
+    setLoading(false);
   };
   const onLogin = async (data: LoginValues) => {
+    setLoading(true);
     const response = await loginUser(data?.email, data?.password);
     if (!response?.success) {
       toast.warning(response?.message);
@@ -72,6 +79,7 @@ export function SignupForm() {
     }
     toast.success(response?.message);
     router.push("/dashboard");
+    setLoading(false);
   };
 
   const activeForm = tab === "register" ? registerForm : loginForm;
@@ -172,8 +180,16 @@ export function SignupForm() {
               <Button
                 type="submit"
                 className="w-full h-12 rounded-full bg-brand-orange hover:bg-brand-orange/90 text-brand-orange-foreground text-sm font-semibold shadow-md"
+                disabled={loading}
               >
-                Create an Account
+                {loading ? (
+                  <>
+                    <p>"Creating account..."</p>
+                    <Spinner></Spinner>
+                  </>
+                ) : (
+                  "Create an Account"
+                )}
               </Button>
             </form>
           </Form>
@@ -237,8 +253,16 @@ export function SignupForm() {
               <Button
                 type="submit"
                 className="w-full h-12 rounded-full bg-brand-orange hover:bg-brand-orange/90 text-brand-orange-foreground text-sm font-semibold shadow-md"
+                disabled={loading}
               >
-                Log In
+                {loading ? (
+                  <>
+                    <p>"Logging in..."</p>
+                    <Spinner></Spinner>
+                  </>
+                ) : (
+                  "Log In"
+                )}
               </Button>
 
               <p className="text-center text-sm text-muted-foreground">
