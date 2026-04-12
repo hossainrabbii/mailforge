@@ -66,6 +66,7 @@ export function SignupForm() {
       }, 100); // avoids race condition
     } catch (err) {
       toast.error("Something went wrong");
+      setLoading(false);
     }
     setLoading(false);
   };
@@ -74,6 +75,8 @@ export function SignupForm() {
     const response = await loginUser(data?.email, data?.password);
     if (!response?.success) {
       toast.warning(response?.message);
+      setLoading(false);
+
       return;
     }
     toast.success(response?.message);
