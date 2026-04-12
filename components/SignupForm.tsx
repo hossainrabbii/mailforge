@@ -48,7 +48,6 @@ export function SignupForm() {
     defaultValues: { email: "", password: "" },
   });
 
-  setLoading(true);
   const onRegister = async (data: RegisterValues) => {
     setLoading(true);
 
