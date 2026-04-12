@@ -185,7 +185,7 @@ export function SignupForm() {
                 {loading ? (
                   <>
                     <p>"Creating account..."</p>
-                    <Spinner></Spinner>
+                    <Spinner />
                   </>
                 ) : (
                   "Create an Account"
@@ -258,7 +258,7 @@ export function SignupForm() {
                 {loading ? (
                   <>
                     <p>"Logging in..."</p>
-                    <Spinner></Spinner>
+                    <Spinner />
                   </>
                 ) : (
                   "Log In"
