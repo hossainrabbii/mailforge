@@ -10,7 +10,6 @@ const publicRoutes = ["/"];
 const protectedRoutes = ["/dashboard", "/calendar", "/profile"];
 const adminRoutes = ["/leads", "/mail", "/templates", "/users"];
 
-// NEW: try to refresh token silently
 const tryRefresh = async (req: NextRequest): Promise<string | null> => {
   try {
     const refreshToken = req.cookies.get("refreshToken")?.value;
@@ -19,7 +18,7 @@ const tryRefresh = async (req: NextRequest): Promise<string | null> => {
     const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
       method: "POST",
       headers: {
-        Cookie: `refreshToken=${refreshToken}`, // forward cookie to backend
+        Cookie: `refreshToken=${refreshToken}`,
       },
     });
 
@@ -32,14 +31,14 @@ const tryRefresh = async (req: NextRequest): Promise<string | null> => {
   }
 };
 
-export async function proxy(req: NextRequest) {
+// EDITED: default export instead of named export
+export default async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   const isPublic = publicRoutes.includes(pathname);
   const isProtected = protectedRoutes.some((r) => pathname.startsWith(r));
   const isAdmin = adminRoutes.some((r) => pathname.startsWith(r));
 
-  // public route
   if (isPublic) {
     const accessToken = req.cookies.get("accessToken")?.value;
     if (accessToken) {
@@ -47,7 +46,6 @@ export async function proxy(req: NextRequest) {
         await jwtVerify(accessToken, ACCESS_SECRET);
         return NextResponse.redirect(new URL("/dashboard", req.url));
       } catch {
-        // expired — try refresh
         const newToken = await tryRefresh(req);
         if (newToken) {
           const res = NextResponse.redirect(new URL("/dashboard", req.url));
@@ -65,7 +63,6 @@ export async function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // protected or admin route
   const accessToken = req.cookies.get("accessToken")?.value;
 
   let isValid = false;
@@ -77,29 +74,20 @@ export async function proxy(req: NextRequest) {
       isValid = true;
       role = payload.role as string;
     } catch {
-      // NEW: accessToken expired → try refresh silently
       const newToken = await tryRefresh(req);
-
       if (newToken) {
         try {
-          const { payload } = await jwtVerify(
-            newToken,
-            ACCESS_SECRET,
-          );
+          const { payload } = await jwtVerify(newToken, ACCESS_SECRET);
           isValid = true;
           role = payload.role as string;
-
-          // NEW: set new accessToken cookie and continue
           const res = NextResponse.next();
           res.cookies.set("accessToken", newToken, {
-            httpOnly: false, // must be false so JS can read it
+            httpOnly: false,
             secure: true,
             sameSite: "none",
             maxAge: 2 * 60 * 60,
             path: "/",
           });
-
-          // also update localStorage via a header the client can read
           res.headers.set("x-new-access-token", newToken);
           return res;
         } catch {
@@ -109,10 +97,8 @@ export async function proxy(req: NextRequest) {
     }
   }
 
-  // no accessToken at all → try refresh
   if (!accessToken && (isProtected || isAdmin)) {
     const newToken = await tryRefresh(req);
-
     if (newToken) {
       try {
         const { payload } = await jwtVerify(newToken, ACCESS_SECRET);
@@ -125,18 +111,14 @@ export async function proxy(req: NextRequest) {
           path: "/",
         });
         res.headers.set("x-new-access-token", newToken);
-
-        // check admin
         if (isAdmin && payload.role !== "admin") {
           return NextResponse.redirect(new URL("/unauthorized", req.url));
         }
-
         return res;
       } catch {
         return NextResponse.redirect(new URL("/", req.url));
       }
     }
-
     return NextResponse.redirect(new URL("/", req.url));
   }
 
