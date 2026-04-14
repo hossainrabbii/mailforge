@@ -142,10 +142,12 @@ export default function WebsitesPage({ website, error }: IProps) {
         ),
       );
       toast.success("Website Updated.");
+      setDisableSubmitBtn(false);
     } else {
       const response = await createWebsite(data);
       if (!response?.success) {
         toast.error(response?.message);
+        setDisableSubmitBtn(false);
         return;
       }
       toast.success("Website Added.");
@@ -163,7 +165,6 @@ export default function WebsitesPage({ website, error }: IProps) {
     }
 
     setDisableSubmitBtn(false);
-    // FIXED: always reset to emptyForm — no undefined values
     setDialogOpen(false);
     setEditingId(null);
     form.reset(emptyForm);
