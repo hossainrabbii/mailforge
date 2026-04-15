@@ -12,7 +12,7 @@ const Dashboard = async () => {
 
   const stats = [
     {
-      label: "Total Websites",
+      label: "Total Leads",
       value: data.length,
       icon: Globe,
       color: "text-primary",

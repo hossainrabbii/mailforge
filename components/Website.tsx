@@ -196,7 +196,6 @@ export default function WebsitesPage({ website, error }: IProps) {
     toast.warning(res?.message);
     setWebsites((prev) => prev.filter((w) => w._id !== id));
   };
-
   return (
     <div className="space-y-4 p-4">
       {/* Toolbar */}
@@ -217,11 +216,22 @@ export default function WebsitesPage({ website, error }: IProps) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="processing">Processing</SelectItem>
-              <SelectItem value="sent">Sent</SelectItem>
-              <SelectItem value="failed">Failed</SelectItem>
+              <SelectItem value="all">All ({filtered.length})</SelectItem>
+              <SelectItem value="pending">
+                Pending (
+                {filtered.filter((w) => w.mailStatus === "pending").length})
+              </SelectItem>
+              <SelectItem value="processing">
+                Processing (
+                {filtered.filter((w) => w.mailStatus === "processing").length})
+              </SelectItem>
+              <SelectItem value="sent">
+                Sent ({filtered.filter((w) => w.mailStatus === "sent").length})
+              </SelectItem>
+              <SelectItem value="failed">
+                Failed (
+                {filtered.filter((w) => w.mailStatus === "failed").length})
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -239,14 +249,14 @@ export default function WebsitesPage({ website, error }: IProps) {
         >
           <DialogTrigger asChild>
             <Button size="sm">
-              <Plus className="h-4 w-4 mr-1" /> Add Website
+              <Plus className="h-4 w-4 mr-1" /> Add Leads
             </Button>
           </DialogTrigger>
 
           <DialogContent className="max-w-lg">
             <DialogHeader>
               <DialogTitle>
-                {editingId ? "Edit Website" : "Add Website"}
+                {editingId ? "Edit Leads" : "Add Leads"}
               </DialogTitle>
             </DialogHeader>
 

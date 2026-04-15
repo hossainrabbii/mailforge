@@ -8,7 +8,7 @@ const page = async () => {
   if (!response.success) {
     return (
       <>
-        <Navbar sectionName="Websites" />
+        <Navbar sectionName="Leads" />
         <WebsitesPage website={[]} error={response.message} />
       </>
     );
@@ -16,7 +16,7 @@ const page = async () => {
 
   return (
     <>
-      <Navbar sectionName="Websites" />
+      <Navbar sectionName="Leads" />
       <WebsitesPage website={response.data} error={null} />
     </>
   );

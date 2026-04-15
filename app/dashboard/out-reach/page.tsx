@@ -9,7 +9,7 @@ const page = async () => {
   if (!websites.success && !templates?.success) {
     return (
       <>
-        <Navbar sectionName="Send Mail" />
+        <Navbar sectionName="Out Reach" />
         <SendMailPage template={[]} website={[]} error="Something went wrong" />
       </>
     );
@@ -18,7 +18,7 @@ const page = async () => {
   if (!websites.success && templates?.success) {
     return (
       <>
-        <Navbar sectionName="Send Mail" />
+        <Navbar sectionName="Out Reach" />
         <SendMailPage
           website={[]}
           template={templates?.data}
@@ -31,7 +31,7 @@ const page = async () => {
   if (websites.success && !templates?.success) {
     return (
       <>
-        <Navbar sectionName="Send Mail" />
+        <Navbar sectionName="Out Reach" />
 
         <SendMailPage
           website={websites?.data}
@@ -44,7 +44,7 @@ const page = async () => {
 
   return (
     <>
-      <Navbar sectionName="Send Mail" />
+      <Navbar sectionName="Out Reach" />
       <SendMailPage
         website={websites?.data}
         template={templates?.data}
