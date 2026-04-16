@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Search, Send } from "lucide-react";
+import { Search, Send, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -27,15 +27,15 @@ import {
 import { StatusBadge } from "@/components/StatusBadge";
 import type { Website, Template } from "@/types";
 import { toast } from "sonner";
-import { sendMail } from "@/services/mail";
-import { useMailSSE } from "@/hooks/useMailSSE";
 import { CountdownCircle } from "@/components/CountdownCircle";
+import { useMailQueue } from "@/hooks/useMailQueue";
 
 interface IProps {
   template: Template[];
   website: Website[];
   error: string | null;
 }
+
 type MailStatus = "all" | "pending" | "sent" | "failed";
 
 export default function SendMailPage({ template, website, error }: IProps) {
@@ -45,40 +45,33 @@ export default function SendMailPage({ template, website, error }: IProps) {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<MailStatus>("pending");
-  const [countdownMs, setCountdownMs] = useState<number | null>(null);
+
+  // NEW: use queue hook
+  const { state, startQueue, stopQueue } = useMailQueue();
 
   useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
+    if (error) toast.error(error);
   }, [error]);
-  useMailSSE({
-    onCountdown: (delayMs) => setCountdownMs(delayMs),
-    onDone: () => setCountdownMs(null),
-  });
 
   const filtered = websites.filter((w) => {
     const searchText = search.toLowerCase();
-
     const matchesSearch =
       !search ||
       w.name?.toLowerCase().includes(searchText) ||
       w.currentUrl?.toLowerCase().includes(searchText);
     const matchesStatus =
       statusFilter === "all" || w.mailStatus === statusFilter;
-
     return matchesSearch && matchesStatus;
   });
 
   const selectedTemplate = templates.find((t) => t._id === selectedTemplateId);
   const firstSelected = websites.find((w) => selectedIds.has(w._id));
+
   const previewHtml = useMemo(() => {
     if (!selectedTemplate || !firstSelected) return "";
-
     const name = firstSelected.name || "Client";
     const currentUrl = firstSelected.currentUrl || "";
     const remakeUrl = firstSelected.remakeUrl || "";
-
     return selectedTemplate.bodyHtml
       .replace(/\{\{name\}\}/g, name)
       .replace(/\{\{currentUrl\}\}/g, currentUrl)
@@ -92,10 +85,8 @@ export default function SendMailPage({ template, website, error }: IProps) {
 
   const previewSubject = useMemo(() => {
     if (!selectedTemplate || !firstSelected) return "";
-
     const name = firstSelected.name || "Client";
     const currentUrl = firstSelected.currentUrl || "";
-
     return selectedTemplate.subject
       .replace(/\{\{name\}\}/g, name)
       .replace(/\{\{currentUrl\}\}/g, currentUrl);
@@ -107,26 +98,46 @@ export default function SendMailPage({ template, website, error }: IProps) {
     setSelectedIds(next);
   };
 
+  // NEW: start queue instead of old sendMail
   const handleSend = async () => {
-    const data = {
-      selectedIds: Array.from(selectedIds),
-      selectedTemplateId,
-    };
-    await sendMail(data);
-    toast("Emails queued!");
+    await startQueue(Array.from(selectedIds), selectedTemplateId);
   };
 
-  const canSend = selectedIds.size > 0 && !!selectedTemplateId;
+  const canSend =
+    selectedIds.size > 0 && !!selectedTemplateId && !state.running;
 
   return (
     <div className="space-y-4">
-      {countdownMs && (
+      {/* NEW: queue progress bar */}
+      {state.running && (
+        <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/30">
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+            <p className="text-sm font-medium">
+              Sending {state.currentIndex} of {state.total}...
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={stopQueue}
+            className="gap-1.5"
+          >
+            <Square className="w-3 h-3" />
+            Stop
+          </Button>
+        </div>
+      )}
+
+      {/* countdown circle */}
+      {state.countdownMs && (
         <div className="flex justify-center py-2">
-          <CountdownCircle delayMs={countdownMs} />
+          <CountdownCircle delayMs={state.countdownMs} />
         </div>
       )}
 
       <div className="grid gap-6 lg:grid-cols-2 h-full">
+        {/* Left: Recipients */}
         <Card className="shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Select Recipients</CardTitle>
@@ -140,7 +151,6 @@ export default function SendMailPage({ template, website, error }: IProps) {
                   className="pl-9"
                 />
               </div>
-
               <Select
                 value={statusFilter}
                 onValueChange={(value) => setStatusFilter(value as MailStatus)}
@@ -178,7 +188,7 @@ export default function SendMailPage({ template, website, error }: IProps) {
                 <div className="flex gap-2">
                   <small>
                     <strong>{w.majorIssues || ""}</strong>
-                  </small>{" "}
+                  </small>
                   <StatusBadge status={w.mailStatus} />
                 </div>
               </label>
@@ -191,7 +201,7 @@ export default function SendMailPage({ template, website, error }: IProps) {
           </CardContent>
         </Card>
 
-        {/* Right: Template & Preview — unchanged */}
+        {/* Right: Template & Preview */}
         <div className="space-y-4">
           <Card className="shadow-sm">
             <CardHeader className="pb-3">
@@ -259,7 +269,8 @@ export default function SendMailPage({ template, website, error }: IProps) {
                   </AlertDialogTitle>
                   <AlertDialogDescription>
                     This will send emails using &quot;{selectedTemplate?.name}
-                    &quot; to {selectedIds.size} selected websites.
+                    &quot; to {selectedIds.size} selected websites with random
+                    delays between each send.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
