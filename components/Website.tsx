@@ -311,7 +311,7 @@ export default function WebsitesPage({ website, error }: IProps) {
                     Cancel
                   </Button>
                   <Button disabled={disableSubmitBtn} type="submit">
-                    {editingId ? <>Update <Spinner/></> : <>Add <Spinner/></>}
+                    {editingId ? <>Update {disableSubmitBtn ? <Spinner/> : null}</> : <>Add {disableSubmitBtn ? <Spinner/> : null}</>}
                   </Button>
                 </div>
               </form>
