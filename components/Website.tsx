@@ -47,6 +47,7 @@ import {
 } from "@/services/websites";
 import { toast } from "sonner";
 import Link from "next/link";
+import { Spinner } from "./ui/spinner";
 
 const websiteSchema = z.object({
   name: z.string().trim().max(100).optional(),
@@ -310,7 +311,7 @@ export default function WebsitesPage({ website, error }: IProps) {
                     Cancel
                   </Button>
                   <Button disabled={disableSubmitBtn} type="submit">
-                    {editingId ? "Update" : "Add"}
+                    {editingId ? <>Update <Spinner/></> : <>Add <Spinner/></>}
                   </Button>
                 </div>
               </form>
