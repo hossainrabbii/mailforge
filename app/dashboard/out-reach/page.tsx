@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import Navbar from "@/components/Navbar";
 import SendMailPage from "@/components/SendMail";
 import { getAllTemplates } from "@/services/templates";
-import { getAllWebsites } from "@/services/websites";
+import { getAllWebsites } from "@/services/leads";
 const page = async () => {
   const websites = await getAllWebsites();
   const templates = await getAllTemplates();

@@ -41,10 +41,10 @@ import {
   FormMessage,
 } from "./ui/form";
 import {
-  createWebsite,
-  deleteWebsite,
-  updateWebsite,
-} from "@/services/websites";
+  createLead,
+  deleteLead,
+  updateLead,
+} from "@/services/leads";
 import { toast } from "sonner";
 import Link from "next/link";
 import { Spinner } from "./ui/spinner";
@@ -73,10 +73,9 @@ interface IProps {
 
 type WebsiteFormValues = z.infer<typeof websiteSchema>;
 
-// FIXED: all fields default to "" never undefined
 const emptyForm: WebsiteFormValues = {
   name: "",
-  currentUrl: "", // FIXED: was undefined
+  currentUrl: "", 
   remakeUrl: "",
   mailId: "",
   associateMail: "",
@@ -101,7 +100,7 @@ export default function WebsitesPage({ website, error }: IProps) {
 
   const form = useForm<WebsiteFormValues>({
     resolver: zodResolver(websiteSchema),
-    defaultValues: emptyForm, // FIXED: use emptyForm constant
+    defaultValues: emptyForm, 
   });
 
   const filtered = websites.filter((w) => {
@@ -130,7 +129,7 @@ export default function WebsitesPage({ website, error }: IProps) {
   const onSubmit = async (data: WebsiteFormValues) => {
     setDisableSubmitBtn(true);
     if (editingId) {
-      const response = await updateWebsite(editingId, data);
+      const response = await updateLead(editingId, data);
       if (!response?.success) {
         toast.error(response?.message || "Something went wrong");
         return;
@@ -142,16 +141,16 @@ export default function WebsitesPage({ website, error }: IProps) {
             : w,
         ),
       );
-      toast.success("Website Updated.");
+      toast.success("Lead updated.");
       setDisableSubmitBtn(false);
     } else {
-      const response = await createWebsite(data);
+      const response = await createLead(data);
       if (!response?.success) {
         toast.error(response?.message);
         setDisableSubmitBtn(false);
         return;
       }
-      toast.success("Website Added.");
+      toast.success("Lead added.");
       setWebsites((prev) => [
         ...prev,
         {
@@ -173,10 +172,9 @@ export default function WebsitesPage({ website, error }: IProps) {
 
   const handleEdit = (w: Website) => {
     setEditingId(w._id);
-    // FIXED: all fields fallback to "" never undefined
     form.reset({
       name: w.name || "",
-      currentUrl: w.currentUrl || "", // FIXED: was undefined
+      currentUrl: w.currentUrl || "",
       remakeUrl: w.remakeUrl || "",
       mailId: w.mailId || "",
       associateMail: w.associateMail || "",
@@ -189,7 +187,7 @@ export default function WebsitesPage({ website, error }: IProps) {
   };
 
   const handleDelete = async (id: string) => {
-    const res = await deleteWebsite(id);
+    const res = await deleteLead(id);
     if (!res?.success) {
       toast.error(res?.message);
       return;
@@ -199,7 +197,6 @@ export default function WebsitesPage({ website, error }: IProps) {
   };
   return (
     <div className="space-y-4 p-4">
-      {/* Toolbar */}
       <div className="flex flex-wrap gap-3 justify-between">
         <div className="flex gap-2 flex-1">
           <div className="relative max-w-sm w-full">
@@ -241,7 +238,6 @@ export default function WebsitesPage({ website, error }: IProps) {
           open={dialogOpen}
           onOpenChange={(open) => {
             setDialogOpen(open);
-            // FIXED: reset form when dialog closes
             if (!open) {
               setEditingId(null);
               form.reset(emptyForm);
@@ -288,7 +284,6 @@ export default function WebsitesPage({ website, error }: IProps) {
                             {fieldName}
                           </FormLabel>
                           <FormControl>
-                            {/* FIXED: always fallback to "" */}
                             <Input {...field} value={field.value ?? ""} />
                           </FormControl>
                           <FormMessage />
@@ -320,7 +315,6 @@ export default function WebsitesPage({ website, error }: IProps) {
         </Dialog>
       </div>
 
-      {/* Table */}
       <div className="border rounded-lg">
         {filtered?.length === 0 ? (
           <p className="p-4">No data found</p>

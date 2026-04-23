@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 import { Globe, Send, Clock, AlertCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { getAllWebsites } from "@/services/websites";
+import { getAllWebsites } from "@/services/leads";
 import Navbar from "@/components/Navbar";
 import { EmailCalendar } from "@/components/EmailCalendar";
 
