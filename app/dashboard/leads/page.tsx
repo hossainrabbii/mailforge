@@ -1,9 +1,9 @@
 export const dynamic = "force-dynamic";
 import Navbar from "@/components/Navbar";
 import WebsitesPage from "@/components/Website";
-import { getAllWebsites } from "@/services/leads";
+import { getAllLeads } from "@/services/leads";
 const page = async () => {
-  const response = await getAllWebsites();
+  const response = await getAllLeads();
   // console.log(response);
   if (!response.success) {
     return (
