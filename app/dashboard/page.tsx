@@ -1,12 +1,12 @@
 export const dynamic = "force-dynamic";
 import { Globe, Send, Clock, AlertCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { getAllWebsites } from "@/services/leads";
+import { getAllLeads } from "@/services/leads";
 import Navbar from "@/components/Navbar";
 import { EmailCalendar } from "@/components/EmailCalendar";
 
 const Dashboard = async () => {
-  const response = await getAllWebsites();
+  const response = await getAllLeads();
 
   const data = response?.data ?? [];
 
