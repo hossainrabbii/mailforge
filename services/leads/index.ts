@@ -9,7 +9,7 @@ const BASE_URL = `${process.env.NEXT_PUBLIC_BASE_API}/leads`;
  */
 export const createLead = async (payload: any) => {
   try {
-    const res = await fetch(BASE_URL, {
+    const res = await fetchWithRefresh(BASE_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
