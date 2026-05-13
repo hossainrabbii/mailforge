@@ -13,6 +13,7 @@ export interface Website {
   mailStatus: MailStatus;
   sentAt?: Date;
   majorIssues: string;
+  timezone?: string | null;
 }
 
 export interface Template {

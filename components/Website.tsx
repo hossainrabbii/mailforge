@@ -40,14 +40,10 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
-import {
-  createLead,
-  deleteLead,
-  updateLead,
-} from "@/services/leads";
 import { toast } from "sonner";
 import Link from "next/link";
 import { Spinner } from "./ui/spinner";
+import { createLead, deleteLead, updateLead } from "@/services/leads";
 
 const websiteSchema = z.object({
   name: z.string().trim().max(100).optional(),
@@ -128,46 +124,54 @@ export default function WebsitesPage({ website, error }: IProps) {
 
   const onSubmit = async (data: WebsiteFormValues) => {
     setDisableSubmitBtn(true);
-    if (editingId) {
-      const response = await updateLead(editingId, data);
-      if (!response?.success) {
-        toast.error(response?.message || "Something went wrong");
-        return;
+    try {
+      if (editingId) {
+        const response = await updateLead(editingId, data);
+        if (!response?.success) {
+          toast.error(response?.message || "Something went wrong");
+          return;
+        }
+        setWebsites((prev) =>
+          prev.map((w) =>
+            w._id === editingId
+              ? { ...w, ...data, remakeUrl: data.remakeUrl || undefined }
+              : w,
+          ),
+        );
+        toast.success("Lead updated.");
+      } else {
+        const response = await createLead(data);
+        if (!response?.success) {
+          toast.error(
+            response?.message ?? "Failed to add lead. Please try again.",
+          );
+          return;
+        }
+        toast.success("Lead added.");
+        const created = response?.data as Website | undefined;
+        setWebsites((prev) => [
+          ...prev,
+          {
+            _id: (created?._id as string) ?? crypto.randomUUID(),
+            ...data,
+            currentUrl: data.currentUrl?.trim() || undefined,
+            associateMail: data.associateMail?.trim() || undefined,
+            remakeUrl: data.remakeUrl || undefined,
+            mailStatus: created?.mailStatus ?? "pending",
+            sentAt: created?.sentAt,
+            timezone: created?.timezone,
+          },
+        ]);
       }
-      setWebsites((prev) =>
-        prev.map((w) =>
-          w._id === editingId
-            ? { ...w, ...data, remakeUrl: data.remakeUrl || undefined }
-            : w,
-        ),
-      );
-      toast.success("Lead updated.");
-      setDisableSubmitBtn(false);
-    } else {
-      const response = await createLead(data);
-      if (!response?.success) {
-        toast.error(response?.message);
-        setDisableSubmitBtn(false);
-        return;
-      }
-      toast.success("Lead added.");
-      setWebsites((prev) => [
-        ...prev,
-        {
-          _id: crypto.randomUUID(),
-          ...data,
-          currentUrl: data.currentUrl?.trim() || undefined,
-          associateMail: data.associateMail?.trim() || undefined,
-          remakeUrl: data.remakeUrl || undefined,
-          mailStatus: "pending",
-        },
-      ]);
-    }
 
-    setDisableSubmitBtn(false);
-    setDialogOpen(false);
-    setEditingId(null);
-    form.reset(emptyForm);
+      setDialogOpen(false);
+      setEditingId(null);
+      form.reset(emptyForm);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Something went wrong");
+    } finally {
+      setDisableSubmitBtn(false);
+    }
   };
 
   const handleEdit = (w: Website) => {
@@ -300,6 +304,7 @@ export default function WebsitesPage({ website, error }: IProps) {
                     onClick={() => {
                       setDialogOpen(false);
                       setEditingId(null);
+                      setDisableSubmitBtn(false)
                       form.reset(emptyForm);
                     }}
                   >

@@ -2,14 +2,12 @@
 
 import { fetchWithRefresh } from "@/lib/fetchWithRefresh";
 
-const BASE_URL = `${process.env.NEXT_PUBLIC_BASE_API}/leads`;
-
 /**
  * CREATE lead
  */
-export const createLead = async (payload: any) => {
+export const createLead = async (payload: unknown) => {
   try {
-    const res = await fetchWithRefresh(BASE_URL, {
+    return await fetchWithRefresh("/leads", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -17,23 +15,16 @@ export const createLead = async (payload: any) => {
       body: JSON.stringify(payload),
       cache: "no-store",
     });
-
-    const data = await res.json();
-    if (!res.ok) {
-      return data;
-    }
-
-    return data;
-  } catch (error: any) {
-    console.log(error);
-    throw new Error(error.message);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Failed to create lead";
+    return { success: false, message, data: null };
   }
 };
 
 /**
  * GET ALL leads
  */
-
 export const getAllLeads = async () => {
   try {
     const data = await fetchWithRefresh("/leads", {
@@ -50,7 +41,7 @@ export const getAllLeads = async () => {
     }
 
     return data;
-  } catch (error: any) {
+  } catch {
     return {
       success: false,
       message: "Network error — is the server running?",
@@ -64,27 +55,26 @@ export const getAllLeads = async () => {
  */
 export const getLeadById = async (id: string) => {
   try {
-    const res = await fetch(`${BASE_URL}/${id}`, {
+    const data = await fetchWithRefresh(`/leads/${id}`, {
       method: "GET",
       cache: "no-store",
     });
-
-    if (!res.ok) {
-      throw new Error("lead not found");
+    if (!data.success) {
+      throw new Error(data.message || "Lead not found");
     }
-
-    return await res.json();
-  } catch (error: any) {
-    throw new Error(error.message);
+    return data;
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Lead not found";
+    throw new Error(message);
   }
 };
 
 /**
  * UPDATE lead
  */
-export const updateLead = async (id: string, payload: any) => {
+export const updateLead = async (id: string, payload: unknown) => {
   try {
-    const res = await fetch(`${BASE_URL}/${id}`, {
+    return await fetchWithRefresh(`/leads/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -92,14 +82,10 @@ export const updateLead = async (id: string, payload: any) => {
       body: JSON.stringify(payload),
       cache: "no-store",
     });
-
-    if (!res.ok) {
-      throw new Error("Failed to update lead");
-    }
-
-    return await res.json();
-  } catch (error: any) {
-    throw new Error(error.message);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Failed to update lead";
+    return { success: false, message, data: null };
   }
 };
 
@@ -108,17 +94,13 @@ export const updateLead = async (id: string, payload: any) => {
  */
 export const deleteLead = async (id: string) => {
   try {
-    const res = await fetch(`${BASE_URL}/${id}`, {
+    return await fetchWithRefresh(`/leads/${id}`, {
       method: "DELETE",
       cache: "no-store",
     });
-
-    if (!res.ok) {
-      throw new Error("Failed to delete lead");
-    }
-
-    return await res.json();
-  } catch (error: any) {
-    throw new Error(error.message);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Failed to delete lead";
+    return { success: false, message, data: null };
   }
 };
