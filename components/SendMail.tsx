@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Search, Send } from "lucide-react";
+import { Plus, Search, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { sendMail } from "@/services/mail";
 import { useMailSSE } from "@/hooks/useMailSSE";
 import { CountdownCircle } from "@/components/CountdownCircle";
+import Link from "next/link";
 
 interface IProps {
   template: Template[];
@@ -206,7 +207,20 @@ export default function SendMailPage({ template, website, error }: IProps) {
               <CardTitle className="text-base">Select Template</CardTitle>
             </CardHeader>
             <CardContent>
-              <Select
+              {templates.length === 0 ? (
+               <div className="flex gap-4">
+                 <p className="text-center text-muted-foreground py-8">
+                  No templates found
+                </p>
+                <Link href="/dashboard/templates">
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Template
+                </Button>
+                </Link>
+               </div>
+              ) : (
+                <Select
                 value={selectedTemplateId}
                 onValueChange={setSelectedTemplateId}
               >
@@ -220,7 +234,8 @@ export default function SendMailPage({ template, website, error }: IProps) {
                     </SelectItem>
                   ))}
                 </SelectContent>
-              </Select>
+              </Select>)}
+             
             </CardContent>
           </Card>
 
