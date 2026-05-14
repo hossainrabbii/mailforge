@@ -366,5 +366,5 @@ export default function TemplatesPage({ template, error }: IProps) {
         ))}
       </div>
     </div>
-  );
+  )
 }

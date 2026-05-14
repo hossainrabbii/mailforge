@@ -48,28 +48,29 @@ export function SignupForm() {
     defaultValues: { email: "", password: "" },
   });
 
-  const onRegister = async (data: RegisterValues) => {
-    setLoading(true);
+// only the onRegister handler changes
+const onRegister = async (data: RegisterValues) => {
+  setLoading(true);
+  try {
+    const response = await registerUser(data.email, data.password);
 
-    try {
-      const response = await registerUser(data.email, data.password);
-
-      if (!response?.success) {
-        toast.warning(response?.message || "Registration failed");
-        return;
-      }
-
-      toast.success(response.message);
-
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 100); // avoids race condition
-    } catch (err) {
-      toast.error("Something went wrong");
-      setLoading(false);
+    if (!response?.success) {
+      toast.warning(response?.message || "Registration failed");
+      return;
     }
+
+    toast.success("Check your email for the OTP!");
+
+    // NEW: redirect to verify-otp with userId and email
+    router.push(
+      `/verify-otp?userId=${response.userId}&email=${encodeURIComponent(response.email)}`,
+    );
+  } catch {
+    toast.error("Something went wrong");
+  } finally {
     setLoading(false);
-  };
+  }
+};
   const onLogin = async (data: LoginValues) => {
     setLoading(true);
     const response = await loginUser(data?.email, data?.password);

@@ -193,9 +193,17 @@ export default function SendMailPage({ template, website, error }: IProps) {
               </label>
             ))}
             {filtered.length === 0 && (
-              <p className="text-center text-muted-foreground py-8">
+             <div className="flex gap-4">
+               <p className="text-center text-muted-foreground ">
                 No websites found
               </p>
+              <Link href="/dashboard/leads">
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Leads
+                </Button>
+              </Link>
+             </div>
             )}
           </CardContent>
         </Card>
@@ -209,7 +217,7 @@ export default function SendMailPage({ template, website, error }: IProps) {
             <CardContent>
               {templates.length === 0 ? (
                <div className="flex gap-4">
-                 <p className="text-center text-muted-foreground py-8">
+                 <p className="text-center text-muted-foreground">
                   No templates found
                 </p>
                 <Link href="/dashboard/templates">

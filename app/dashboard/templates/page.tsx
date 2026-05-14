@@ -8,7 +8,7 @@ const page = async () => {
     return (
       <>
         <Navbar sectionName="Templates" />
-        <TemplatesPage template={[]} error={templates.message} />;
+        <TemplatesPage template={[]} error={templates.message} />
       </>
     );
   }

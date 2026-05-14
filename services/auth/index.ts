@@ -1,19 +1,16 @@
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_API;
 
-// helper to save accessToken in both places
 const saveAccessToken = (token: string) => {
   localStorage.setItem("accessToken", token);
-  // FIXED: was 15 * 60 (15 mins) — now matches 2h token lifetime
   document.cookie = `accessToken=${token}; path=/; max-age=${2 * 60 * 60}`;
 };
+
 const clearAccessToken = () => {
   localStorage.removeItem("accessToken");
-  // clear cookie too
   document.cookie = "accessToken=; path=/; max-age=0";
 };
 
 export const register = async (email: string, password: string) => {
-  console.log("Reg Frontend:", email);
   try {
     const res = await fetch(`${BASE_URL}/auth/register`, {
       method: "POST",
@@ -21,6 +18,24 @@ export const register = async (email: string, password: string) => {
       body: JSON.stringify({ email, password }),
       credentials: "include",
     });
+    return res.json();
+    // NOTE: register no longer returns tokens
+    // it returns { success, userId, email }
+    // frontend redirects to /verify-otp
+  } catch {
+    return { success: false, message: "Network error" };
+  }
+};
+
+export const login = async (email: string, password: string) => {
+  try {
+    const res = await fetch(`${BASE_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      credentials: "include",
+    });
+
     const data = await res.json();
 
     if (data.success && data.accessToken) {
@@ -33,32 +48,40 @@ export const register = async (email: string, password: string) => {
   }
 };
 
-export const login = async (email: string, password: string) => {
-  console.log(email);
-  console.log(`${BASE_URL}/auth/login`);
+// NEW: verify OTP
+export const verifyOtp = async (userId: string, otp: string) => {
   try {
-    const res = await fetch(`${BASE_URL}/auth/login`, {
+    const res = await fetch(`${BASE_URL}/auth/verify-otp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ userId, otp }),
       credentials: "include",
     });
-    console.log(res);
 
     const data = await res.json();
-    console.log(data);
 
+    // auto login after verification
     if (data.success && data.accessToken) {
       saveAccessToken(data.accessToken);
     }
 
     return data;
-  } catch (error: any) {
-    // this will tell you EXACTLY what's failing
-    console.error("EXACT ERROR:", error);
-    console.error("ERROR NAME:", error.name);
-    console.error("ERROR MESSAGE:", error.message);
-    return { success: false, message: error.message || "Network error" };
+  } catch {
+    return { success: false, message: "Network error" };
+  }
+};
+
+// NEW: resend OTP
+export const resendOtp = async (userId: string) => {
+  try {
+    const res = await fetch(`${BASE_URL}/auth/resend-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId }),
+    });
+    return res.json();
+  } catch {
+    return { success: false, message: "Network error" };
   }
 };
 
@@ -68,7 +91,7 @@ export const logout = async () => {
       method: "POST",
       credentials: "include",
     });
-    clearAccessToken(); // NEW
+    clearAccessToken();
     return res.json();
   } catch {
     return { success: false, message: "Network error" };
