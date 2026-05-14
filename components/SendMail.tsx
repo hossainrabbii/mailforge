@@ -112,8 +112,16 @@ export default function SendMailPage({ template, website, error }: IProps) {
       selectedIds: Array.from(selectedIds),
       selectedTemplateId,
     };
-    await sendMail(data);
-    toast("Emails queued!");
+    try {
+      const result = await sendMail(data);
+      if (!result?.success) {
+        toast.error(result?.message || "Failed to queue emails.");
+        return;
+      }
+      toast("Emails queued!");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to queue emails.");
+    }
   };
 
   const canSend = selectedIds.size > 0 && !!selectedTemplateId;

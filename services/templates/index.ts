@@ -1,13 +1,10 @@
 "use server";
 
-const BASE_URL = `${process.env.NEXT_PUBLIC_BASE_API}/templates`;
+import { fetchWithRefresh } from "@/lib/fetchWithRefresh";
 
-/**
- * CREATE Website
- */
-export const createTemplate = async (payload: any) => {
+export const createTemplate = async (payload: unknown) => {
   try {
-    const res = await fetch(BASE_URL, {
+    return await fetchWithRefresh("/templates", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -15,62 +12,54 @@ export const createTemplate = async (payload: any) => {
       body: JSON.stringify(payload),
       cache: "no-store",
     });
-    if (!res.ok) {
-      throw new Error("Failed to create template");
-    }
-
-    return await res.json();
-  } catch (error: any) {
-    throw new Error(error.message);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Failed to create template";
+    return { success: false, message, data: null };
   }
 };
 
-/**
- * GET ALL Websites
- */
 export const getAllTemplates = async () => {
   try {
-    const res = await fetch(BASE_URL, {
+    const data = await fetchWithRefresh("/templates", {
       method: "GET",
       cache: "no-store",
     });
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch templates");
+    if (!data.success) {
+      return {
+        success: false,
+        message: data.message || "Failed to fetch templates.",
+        data: null,
+      };
     }
 
-    return await res.json();
-  } catch (error: any) {
-    throw new Error(error.message);
+    return data;
+  } catch {
+    return {
+      success: false,
+      message: "Network error — is the server running?",
+      data: null,
+    };
   }
 };
 
-/**
- * GET SINGLE Website
- */
 export const getTemplateById = async (id: string) => {
   try {
-    const res = await fetch(`${BASE_URL}/${id}`, {
+    return await fetchWithRefresh(`/templates/${id}`, {
       method: "GET",
       cache: "no-store",
     });
-
-    if (!res.ok) {
-      throw new Error("Template not found");
-    }
-
-    return await res.json();
-  } catch (error: any) {
-    throw new Error(error.message);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Template not found";
+    return { success: false, message, data: null };
   }
 };
 
-/**
- * UPDATE Website
- */
-export const updateTemplate = async (id: string, payload: any) => {
+export const updateTemplate = async (id: string, payload: unknown) => {
   try {
-    const res = await fetch(`${BASE_URL}/${id}`, {
+    return await fetchWithRefresh(`/templates/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -78,33 +67,22 @@ export const updateTemplate = async (id: string, payload: any) => {
       body: JSON.stringify(payload),
       cache: "no-store",
     });
-
-    if (!res.ok) {
-      throw new Error("Failed to update template");
-    }
-
-    return await res.json();
-  } catch (error: any) {
-    throw new Error(error.message);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Failed to update template";
+    return { success: false, message, data: null };
   }
 };
 
-/**
- * DELETE Website
- */
 export const deleteTemplate = async (id: string) => {
   try {
-    const res = await fetch(`${BASE_URL}/${id}`, {
+    return await fetchWithRefresh(`/templates/${id}`, {
       method: "DELETE",
       cache: "no-store",
     });
-
-    if (!res.ok) {
-      throw new Error("Failed to delete template");
-    }
-
-    return await res.json();
-  } catch (error: any) {
-    throw new Error(error.message);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Failed to delete template";
+    return { success: false, message, data: null };
   }
 };

@@ -18,6 +18,7 @@ export interface Website {
 
 export interface Template {
   _id?: string;
+  userId?: string;
   name: string;
   subject: string;
   bodyHtml: string;

@@ -1,5 +1,7 @@
 "use server";
 
+import { fetchWithRefresh } from "@/lib/fetchWithRefresh";
+
 const BASE_URL = `${process.env.NEXT_PUBLIC_BASE_API}/mail`;
 
 /**
@@ -11,7 +13,7 @@ interface SendMailPayload {
 }
 export const sendMail = async (payload: SendMailPayload) => {
   try {
-    const res = await fetch(`${BASE_URL}/send`, {
+    return await fetchWithRefresh("/mail/send", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -19,16 +21,10 @@ export const sendMail = async (payload: SendMailPayload) => {
       body: JSON.stringify(payload),
       cache: "no-store",
     });
-    if (!res.ok) {
-      throw new Error("Failed to outreach");
-    }
-
-    return await res.json();
-  } catch (
-    error: any
-  ) {
-    console.log(error);
-    throw new Error(error.message);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Failed to outreach";
+    throw new Error(message);
   }
 };
 
