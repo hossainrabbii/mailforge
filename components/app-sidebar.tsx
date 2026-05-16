@@ -67,7 +67,7 @@ const navItems = [
     name: "Settings",
     href: "/dashboard/settings",
     icon: Settings,
-    roles: ["admin"],
+    roles: ["admin",'user'],
   },
   {
     name: "Admin Panel",

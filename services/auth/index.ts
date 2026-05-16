@@ -97,3 +97,29 @@ export const logout = async () => {
     return { success: false, message: "Network error" };
   }
 };
+
+const getToken = () =>
+  typeof window !== "undefined"
+    ? localStorage.getItem("accessToken")
+    : null;
+
+export const saveMailConfig = async (appPassword: string) => {
+  const res = await fetch(`${BASE_URL}/auth/mail-config`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    },
+    body: JSON.stringify({ appPassword }),
+  });
+  return res.json();
+};
+
+export const getMailConfig = async () => {
+  const res = await fetch(`${BASE_URL}/auth/mail-config`, {
+    credentials: "include",
+    headers: { Authorization: `Bearer ${getToken()}` },
+  });
+  return res.json();
+};

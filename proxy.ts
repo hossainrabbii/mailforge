@@ -7,7 +7,7 @@ const ACCESS_SECRET = new TextEncoder().encode(
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_API;
 
 const publicRoutes = ["/",'/verify-otp'];
-const protectedRoutes = ["/dashboard", "/calendar", "/profile"];
+const protectedRoutes = ["/dashboard", "/calendar", "/profile",'/settings'];
 const adminRoutes = ["/leads", "/mail", "/templates", "/users"];
 
 const tryRefresh = async (req: NextRequest): Promise<string | null> => {
