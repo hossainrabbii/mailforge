@@ -13,7 +13,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { register as registerUser, login as loginUser } from "@/services/auth";
+import { register as registerUser, login as loginUser } from "@/services/auth/client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./ui/spinner";

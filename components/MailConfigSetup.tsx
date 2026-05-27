@@ -14,7 +14,7 @@ import {
   ArrowRight,
   Loader2,
 } from "lucide-react";
-import { getMailConfig, saveMailConfig } from "@/services/auth";
+import { getMailConfig, saveMailConfig } from "@/services/auth/server";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_API;
 
@@ -62,7 +62,7 @@ export function MailConfigSetup() {
     };
     load();
   }, []);
-console.log(config)
+// console.log(config);
   const handleSave = async () => {
     if (!appPassword.trim()) {
       toast.error("Please enter your app password");

@@ -24,7 +24,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Button } from "./ui/button";
-import { logout } from "@/services/auth";
+import { logout } from "@/services/auth/client";
 import { toast } from "sonner";
 const navItems = [
   {

@@ -7,7 +7,7 @@ import { EmailCalendar } from "@/components/EmailCalendar";
 
 const Dashboard = async () => {
   const response = await getAllLeads();
-
+console.log(response)
   const data = response?.data ?? [];
 
   const stats = [

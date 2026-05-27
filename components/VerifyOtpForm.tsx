@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { verifyOtp, resendOtp } from "@/services/auth";
+import { verifyOtp, resendOtp } from "@/services/auth/client";
 import { Button } from "@/components/ui/button";
 import { Mail, RefreshCw } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";

@@ -31,7 +31,7 @@ import { sendMail } from "@/services/mail";
 import { useMailSSE } from "@/hooks/useMailSSE";
 import { CountdownCircle } from "@/components/CountdownCircle";
 import Link from "next/link";
-import { getMailConfig } from "@/services/auth";
+import { getMailConfig } from "@/services/auth/server";
 
 interface IProps {
   template: Template[];
@@ -146,10 +146,12 @@ export default function SendMailPage({ template, website, error }: IProps) {
 
   return (
     <>
-
-<p className="text-sm font-semibold text-foreground">
-            {config?.appPassword
-              ? <><div className="space-y-4">
+      {fetching ? null : !config?.appPassword ? (
+        <p className="text-sm font-semibold text-foreground">
+          Gmail not connected, go to settings.
+        </p>
+      ) : (
+        <div className="space-y-4">
               {countdownMs && (
                 <div className="flex justify-center py-2">
                   <CountdownCircle delayMs={countdownMs} />
@@ -325,12 +327,8 @@ export default function SendMailPage({ template, website, error }: IProps) {
                   </div>
                 </div>
               </div>
-            </div></>
-              : "Gmail not connected, go to settings."}
-          </p>
-     
-    
+            </div>
+      )}
     </>
-  
   );
 }
