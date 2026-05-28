@@ -77,12 +77,11 @@ const onRegister = async (data: RegisterValues) => {
     if (!response?.success) {
       toast.warning(response?.message);
       setLoading(false);
-
       return;
     }
     toast.success(response?.message);
     router.push("/dashboard");
-    setLoading(false);
+    // setLoading(false);
   };
 
   const activeForm = tab === "register" ? registerForm : loginForm;
