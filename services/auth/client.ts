@@ -79,6 +79,49 @@ export const resendOtp = async (userId: string) => {
   }
 };
 
+export const requestPasswordReset = async (email: string) => {
+  try {
+    const res = await fetch(`${BASE_URL}/auth/forgot-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    return res.json();
+  } catch {
+    return { success: false, message: "Network error" };
+  }
+};
+
+export const resetPassword = async (
+  userId: string,
+  otp: string,
+  newPassword: string,
+) => {
+  try {
+    const res = await fetch(`${BASE_URL}/auth/reset-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, otp, newPassword }),
+    });
+    return res.json();
+  } catch {
+    return { success: false, message: "Network error" };
+  }
+};
+
+export const resendResetOtp = async (userId: string) => {
+  try {
+    const res = await fetch(`${BASE_URL}/auth/resend-reset-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId }),
+    });
+    return res.json();
+  } catch {
+    return { success: false, message: "Network error" };
+  }
+};
+
 export const logout = async () => {
   try {
     const res = await fetch(`${BASE_URL}/auth/logout`, {

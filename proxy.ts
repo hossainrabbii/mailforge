@@ -6,7 +6,12 @@ const ACCESS_SECRET = new TextEncoder().encode(
 );
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_API;
 
-const publicRoutes = ["/",'/verify-otp'];
+const publicRoutes = [
+  "/",
+  "/verify-otp",
+  "/forgot-password",
+  "/reset-password",
+];
 const protectedRoutes = ["/dashboard", "/calendar", "/profile",'/settings'];
 const adminRoutes = ["/leads", "/mail", "/templates", "/users"];
 
@@ -136,6 +141,9 @@ export default async function proxy(req: NextRequest) {
 export const config = {
   matcher: [
     "/",
+    "/verify-otp",
+    "/forgot-password",
+    "/reset-password",
     "/dashboard/:path*",
     "/calendar/:path*",
     "/profile/:path*",
